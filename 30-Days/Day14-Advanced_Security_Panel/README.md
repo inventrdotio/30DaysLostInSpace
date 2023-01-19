@@ -1,13 +1,13 @@
-# Day XX - ""
+# Day 14 - "Advanced Security Panel"
 
-Video Link: https://www.youtube.com/watch?v=rrHpzDxW1Xg
+[![video](https://github.com/inventrdotio/AdventureKit30Days/blob/main/Youtube.png)](https://www.youtube.com/watch?v=0IulLD1Q1ZM&list=PL-ykYLZSERMSZFH8_4zQx4BMWpt4aG1kr&index=14)
 
 ## Story Synopsis:
 
 Placeholder example: After Just getting your power systems back online and a light to see again, you need to look for a way to save that last bit of remaining battery power remaining until you can deploy the solar panels.... or else it's game over!:
 
 Comic-Style Graphic:
-<img src="https://user-images.githubusercontent.com/15940/207704594-68e639e8-d183-408e-a649-8fd3ede81f99.jpeg" width="200">
+![Art](https://github.com/inventrdotio/AdventureKit30Days/blob/main/Art/sample.jpg "Art")
 
 ```
   digitalWrite(BUZZER_PIN, HIGH); // Turn on buzzer
@@ -21,7 +21,7 @@ Comic-Style Graphic:
 | 2 | + |
 | GND | other |
 
-<img src="DayXX_bb.png" width="350">
+<img src="Day14.webp" width="350">
 
 ### Installation
-No libraries or includes required.
+4x4 Keypad Library Required: [Download](inventr.io/libraries)

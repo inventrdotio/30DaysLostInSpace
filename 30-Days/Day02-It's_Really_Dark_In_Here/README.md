@@ -8,7 +8,7 @@
 Placeholder example: After Just getting your power systems back online and a light to see again, you need to look for a way to save that last bit of remaining battery power remaining until you can deploy the solar panels.... or else it's game over!:
 
 Comic-Style Graphic: <br>
-<img src="https://user-images.githubusercontent.com/15940/207704594-68e639e8-d183-408e-a649-8fd3ede81f99.jpeg" width="200">
+![Art](https://github.com/inventrdotio/AdventureKit30Days/blob/main/Art/sample.jpg "Art")
 
 
 ## Code-Snippet

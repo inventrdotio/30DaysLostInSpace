@@ -35,4 +35,4 @@ void loop() {
 <img src="HEROBoard.png" width="350">
 
 ### Installation
-All required libraries can be found at [inventr.io/libraries](www.inventr.io/libraries)
+All required libraries can be found at [inventr.io/libraries](https://www.inventr.io/libraries)

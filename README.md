@@ -1,4 +1,4 @@
-# ["InventrKits: 30 Days Lost in Space Adventure Kit"](www.inventr.io/sale)
+# ["InventrKits: 30 Days Lost in Space Adventure Kit"](https://www.inventr.io/sale)
 
 <center><i>Your 30 Day Coding And Circuits Challenge To Bring You From Beginner To Builder</i></center>
 

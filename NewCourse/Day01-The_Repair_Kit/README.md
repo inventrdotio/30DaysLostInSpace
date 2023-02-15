@@ -32,6 +32,7 @@ If you open your repair kit you will find the HERO microcontroller wrapped in a 
 * Pin plugs for connecting external devices
 
 ## Testing the HERO
+(SHOULD WE DO LIKE THE OLD VIDEO DOES AND JUST LOAD BLINK EXAMPLE?)
 
 OK, let's make sure the HERO is ready by uploading a simple sketch to the HERO that will blink the built in LED.
 

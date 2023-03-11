@@ -27,9 +27,6 @@ We attached our computer/laptop/MAC/chromebook or linux machine to the HERO boar
     <img src="30Days-Day01-HeroBoard.png" height="300">
 </p>
 
-<img src="DayXX_bb.png" width="350">
-
-
 ## Code Used
 
 ```

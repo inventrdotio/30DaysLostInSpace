@@ -12,7 +12,7 @@ You have crash landed on an unknown planet and now you need to activate and fly 
 
 
 
-[![video](..\Art\VideoScreenshot.png)](https://www.youtube.com/watch?v=faVBaH7iDV0&list=PL-ykYLZSERMSZFH8_4zQx4BMWpt4aG1kr&index=1&t=2s)
+[![video](../Art/VideoScreenshot.png)](https://www.youtube.com/watch?v=faVBaH7iDV0&list=PL-ykYLZSERMSZFH8_4zQx4BMWpt4aG1kr&index=1&t=2s)
 
 
 

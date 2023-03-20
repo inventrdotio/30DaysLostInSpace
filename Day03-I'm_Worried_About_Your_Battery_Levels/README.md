@@ -10,7 +10,7 @@ You've got your lights working, but you now need to be able to turn them on and 
 
 [![video](../Art/VideoScreenshot.png)]( https://www.youtube.com/watch?v=bihCOrv26dY&list=PL-ykYLZSERMSZFH8_4zQx4BMWpt4aG1kr)
 
-## Day 03 Activity
+## Day 3 Activity
 You add a DIP Switch and resistor to your breadboard. At the start of the program, you define 2 integer variables and use them to identify which pins will be used in our circuit. In the setup() function, you use pinMode() function to set up pins as INPUT and OUTPUT. In the loop() function, you use digitalRead() function to determine the value of an input pin. You write a conditional test (if.. else) that will operate some instructions based on the result of the test. You use digitalWrite() function to set these outputs to LOW or HIGH, and the delay() function to affect how long these states should remain before the program continued. The continuous loop means that the LEDs will flash on and off repeatedly. You compile and upload the sketch to the Hero board, which is connected to the breadboard. You modify the code to execute more instructions within the conditional loop.
 
 ## Wiring Diagram
@@ -55,7 +55,7 @@ You add a DIP Switch and resistor to your breadboard. At the start of the progra
 No libraries or includes required.
 
 ---
-## <center><b>Key Learning for Day 2</b></center>
+## <center><b>Key Learning for Day 3</b></center>
 ---
 | Key learning introduced in Day 3 | Example of code / Further instructions|
 | :--- | :--- |

@@ -2,7 +2,7 @@
 
 <p align="center">
     <img src="30DaysDay02.png" height="300"><br>
-    <i>We need some light in this place!</i>
+    <i>You need some light in this place!</i>
 </p>
 
 ## The Story So Far..
@@ -21,11 +21,10 @@ You compile and upload the sketch to the Hero board which is connected to the br
 We've been able to demonstrate and work out the basics of both an analog circuit and its digital control. You can practice with this on your own and next time we will be able to do something even more interesting using our breadboard and Hero controller
 But for now, we've been able to demonstrate and work out the basics of both an analog circuit and its digital control and that's just exactly what we wanted to do in this session. So, for now, you can go ahead and practice with this and we'll sign off for now and next time we'll see if we can do something even more interesting using our breadboard and our Hero controller. So, for now, remember invent safe and we'll see you next time!
 
-
 ## Wiring Diagram
 | HERO | Component |
 | --- | --- |
-| 12 | LED long wire |
+| 12 | LED long wire (220&Omega;) |
 | GND | LED short wire |
 
 ## Fritzing Diagram

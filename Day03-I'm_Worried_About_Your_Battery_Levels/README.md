@@ -18,8 +18,8 @@ You add a DIP Switch and resistor to your breadboard. At the start of the progra
 | --- | --- |
 | 5V | DIP Switch 1 in |
 | 2 | DIP Switch 1 out |
-| 12 | LED long wire |
-| GND | LED short wire |
+| 12 | LED long wire (220&Omega;)|
+| GND | Breadboard -ve rail |
 
 ## Fritzing Diagram
 <i>[(Click here for full size image)](Day3.png)</i>
@@ -60,14 +60,14 @@ No libraries or includes required.
 | Key learning introduced in Day 3 | Example of code / Further instructions|
 | :--- | :--- |
 | We used a DIP (Dual Inline Packet) switch to control an output. | You can find out more about them on [Wikipedia](https://en.wikipedia.org/wiki/DIP_switch) |
-| We learned that a resistor is necessary to set voltage to be HIGH or LOW when using a switch | Find out more in the [notes](#notes) below |
+| We learned that a resistor is necessary to set voltage to be HIGH or LOW when using a switch | Find out more in the additional notes below |
 | We used one of the side strips on the breadboard for ground connection (if the side strips are colored on your breadboard, use the blue one for the ground connection, the red strip for the positive voltage). This makes it possible to connect several circuits to ground or 0V. |  |
 | We used pinMode() function to set a pin as [INPUT](https://www.arduino.cc/reference/en/language/variables/constants/constants/). This is used within the setup() function. | pinMode(Switch1, INPUT); |
 | We used [digitalRead() function](https://www.arduino.cc/reference/en/language/functions/digital-io/digitalread/) to determine the state of the digital input pin. This is used within the loop() function. | digitalRead(Switch1)==HIGH; |
 | We wrote a conditional test that will operate some instructions based on the result of the test. This is used within the loop() function. ‘==’ means ‘is equal to’ | if (digitalRead(Switch1)==HIGH) { <br>&nbsp;&nbsp;// perform the commands in this section if the value of Switch1 is HIGH <br>} <br> else{ <br>&nbsp;&nbsp;// otherwise perform the commands in this section <br> } |
 ---
 
-## Notes
+## Additional Notes
 
 It is important to use a resistor to set voltage LOW or HIGH when using a switch. These diagrams should help to explain why:
 

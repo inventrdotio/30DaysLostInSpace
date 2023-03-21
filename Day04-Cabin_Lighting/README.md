@@ -2,7 +2,7 @@
 
 <p align="center">
     <img src="30DaysDay04.png" height="300"><br>
-    <i>We now want to control more lights!</i>
+    <i>You now want to add more lights to your control panel!</i>
 </p>
 
 ## The Story So Far..
@@ -11,7 +11,7 @@ You now have to be able to control lights in other parts of your shuttle, so you
 [![video](../Art/VideoScreenshot.png)]( https://www.youtube.com/watch?v=EpsJpYL1XZA&list=PL-ykYLZSERMSZFH8_4zQx4BMWpt4aG1kr&t=2s)
 
 ## Day 04 Activity
-We added two more LEDs to the circuit from Day 3, and two more resistors to the breadboard so that we could use the DIP Switch to control 3 outputs. At the start of the code, we defined 6 integer variables that were used to identify which pins would be used in our circuit. In the setup() function, we used the pinMode() function to set up pins as INPUT and OUTPUT. In the loop() function, we used a conditional test that was based on the 3 inputs to turn the 3 LEDs on or off. Switch1 turned LED1 on and off, Switch2 turned LED2 on and off, Switch3 turned LED3 on and off. We compiled and uploaded the sketch and tested it out by using the three switches to turn our LEDs on and off.
+You add two more LEDs to the circuit from Day 3, and two more resistors to the breadboard so that you can use the DIP Switch to control 3 outputs. At the start of the code, you define 6 integer variables that are used to identify which pins will be used in your circuit. In the setup() function, you use the pinMode() function to set up pins as INPUT and OUTPUT. In the loop() function, you use a conditional test that is based on the 3 inputs to turn the 3 LEDs on or off. Switch1 turns LED1 on and off, Switch2 turns LED2 on and off, Switch3 turns LED3 on and off. You compile and upload the sketch and test it out by using the three switches to turn your LEDs on and off.
 
 ## Wiring Diagram:
 | HERO | Component |
@@ -20,9 +20,9 @@ We added two more LEDs to the circuit from Day 3, and two more resistors to the 
 | 2 | DIP Switch 1 out |
 | 3 | DIP Switch 2 out |
 | 4 | DIP Switch 3 out |
-| 10 | Red LED long wire |
-| 11 | Blue LED long wire |
-| 12 | Green LED long wire |
+| 10 | Red LED long wire (220&Omega;)|
+| 11 | Blue LED long wire (220&Omega;) |
+| 12 | Green LED long wire (220&Omega;) |
 | GND | Breadboard -ve rail |
 
 ## Fritzing Diagram

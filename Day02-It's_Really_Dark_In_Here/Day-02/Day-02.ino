@@ -16,6 +16,18 @@
  */
 
 /*
+ * Lesson concepts:
+ * - Circuit (must be complete, no leaks)
+ * - Current / Amperes
+ * - Voltage / Volts
+ * - Resistance / Ohms
+ * - Ohms Law (Current = Voltage / Resistance)
+ *
+ * Arduino/HERO concepts:
+ * - Breadboard
+ * - 5V pins
+ * - GND (Ground) pins
+ *
  * Arduino language concepts introduced/documented in this lesson.
  * - Arduino language.  Based on C++.  Optimized for use with microcontrollers and providing a simplified programming
  *   interface for hardware-specific tasks.
@@ -24,6 +36,7 @@
  * - #include (https://www.arduino.cc/reference/en/language/structure/further-syntax/include/)
  * - #define (https://www.arduino.cc/reference/en/language/structure/further-syntax/define/)
  * - const (https://www.arduino.cc/reference/en/language/variables/variable-scope-qualifiers/const/)
+ * - pinMode() ()
  */
 
 /*
@@ -40,6 +53,10 @@
  * Yesterday we got the built in LED (LED_BUILTIN) to light up.  But that tiny LED won't light
  * up our ship.  Today we'll show how to connected up an external light (using the LED for
  * testing) so we'll need to use another pin on our HERO to turn on our lander's lights.
+ *
+ * In order to emphasize that these names are constants that cannot be change, they are
+ * usually named with all capital letters.  While this isn't required, it's good practice
+ * and helps emphasize that these values do not change while your code is running.
  *
  * We can give a name to our pin two different ways.  The easiest and most common way used
  * in most sketches that you'll see is to use #define.  However, #define can occasionally cause

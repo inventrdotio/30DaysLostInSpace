@@ -1,6 +1,6 @@
 The video titled "Day 3" from the playlist you provided is a continuation of the course that guides the viewer through the process of operating a rescue craft using primitive 21st-century computers and electronics. Here are the key learning points from the video:
 
-1. The video starts with a congratulatory message for successfully turning the lights on and off. It mentions that they will continue working on constructing circuits and controlling them with the hero controller. They also address the issue of dropping power levels and introduce a device called a dip switch, which is a set of three switches that can be used to control separate circuits.
+1.  The video starts with a congratulatory message for successfully turning the lights on and off. It mentions that they will continue working on constructing circuits and controlling them with the hero controller. They also address the issue of dropping power levels and introduce a device called a dip switch, which is a set of three switches that can be used to control separate circuits.
 
 2. The video discusses the use of a device called the Hero to control outputs and accept inputs. It explains that flipping a switch on the device connects pins on opposite sides of a row, creating a complete circuit.
 

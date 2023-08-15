@@ -36,7 +36,9 @@
  * - #include (https://www.arduino.cc/reference/en/language/structure/further-syntax/include/)
  * - #define (https://www.arduino.cc/reference/en/language/structure/further-syntax/define/)
  * - const (https://www.arduino.cc/reference/en/language/variables/variable-scope-qualifiers/const/)
- * - pinMode() ()
+ * - setup() (https://www.arduino.cc/reference/en/language/structure/sketch/setup/)
+ * - loop() (https://www.arduino.cc/reference/en/language/structure/sketch/loop/)
+ * - pinMode() (https://www.arduino.cc/reference/en/language/functions/digital-io/pinmode/)
  */
 
 /*
@@ -62,22 +64,22 @@
  * in most sketches that you'll see is to use #define.  However, #define can occasionally cause
  * odd compile problems AND it doesn't give you any hint what TYPE of data it defines.
  *
- * Better is to use "const", which allows us to define the TYPE of data represented, without
- * potential compile problems.  Here we'll show both so you can recognize them when you see
- * them.  They are both equivalent in this sketch so if you like you can uncomment the #define
- * (by removing the '//') and commenting out the "const" (by adding '//' to the beginning of
- * the line).
+ * Though not as simple to use, the "const" statement is better as it allows us to define the TYPE
+ * of data represented and doesn't have the potential compile problems.  Here we'll show both so
+ * that you can recognize them when you see them.  They are both equivalent in this sketch so if
+ * you like you can uncomment the #define (by removing the '//') and commenting out the "const"
+ * (by adding '//' to the beginning of the line).
  */
 // #define LANDER_LIGHTS_PIN 12           // The HERO Board Pin to wire to our LED
 const uint8_t LANDER_LIGHTS_PIN = 12;  // The HERO Board Pin to wire to our LED
 
-// the setup function runs once when you press reset or power the board
+// The setup() function is called when a sketch starts. Use it to initialize variables, pin
+// modes, start using libraries, etc. The setup() function will only run once, after each
+// powerup or reset of the Arduino board.
 void setup() {
-
-  pinMode(LANDER_LIGHTS_PIN, OUTPUT);     // set digital pin LANDER_LIGHTS_PIN as an output pin.
+  pinMode(LANDER_LIGHTS_PIN, OUTPUT);     // set digital pin defined by LANDER_LIGHTS_PIN as an output pin.
   digitalWrite(LANDER_LIGHTS_PIN, HIGH);  // Turn on ship's lights
 }
 
 // Since we turn on the ship's lights in setup(), there's nothing needed our loop().
-void loop() {
-}
+void loop() {}    // Note that a new line isn't required for an empty set of braces.

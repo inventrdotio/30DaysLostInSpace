@@ -56,6 +56,24 @@
  * up our ship.  Today we'll show how to connected up an external light (using the LED for
  * testing) so we'll need to use another pin on our HERO to turn on our lander's lights.
  *
+ * In the Arduino language we use constants to give names to values used later in our code.
+ * There are many benefits to using these constants and here are a few:
+ * * Readability - When you give a name to a constant it makes the code more readable.  For
+ *                 For example, the LED_BUILTIN constant from Blink.ion let us write
+ *                 "digitalWrite(LED_BUILDIN, HIGH);" instead of "digitalWrite(13, HIGH);".
+ * * Maintainability - If you use a constant in multiple places in your sketch and later find
+ *                     that the value needs to be changed (like if a different pin must be used)
+ *                     then you can just change the constant in one place rather than finding
+ *                     every place in the code.
+ * * Avoiding Hardcoding - What if your sketch used the value "7" in many places?  Some for
+ *                         a pin number, but other times for something like the number of
+ *                         days in a week.  If you had to change the pin number used it would
+ *                         require you to carefully change JUST the value when it's used as a pin.
+ *                         But by using constants, you can just change the value for the pin
+ *                         constant without affecting the use of the other constant.
+ * * Memory efficiency - Constants don't use up valuable RAM space, making our sketches smaller
+ *                       allowing us to write larger sketches.
+ *
  * In order to emphasize that these names are constants that cannot be change, they are
  * usually named with all capital letters.  While this isn't required, it's good practice
  * and helps emphasize that these values do not change while your code is running.

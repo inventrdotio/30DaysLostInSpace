@@ -1,4 +1,5 @@
-/* [Any text between a slash/asterisk and an asterisk/slash is a comment and does not affect the code generated.]
+/* <- Any text between a slash/asterisk and an asterisk/slash is a comment and does not affect the code generated.
+ * <- This asterisk is NOT required in a multi-line comment, but is only here to make the comment look nice.
  *
  * 30 Days - Lost in Space
  * Day 2 - It's Really Dark in Here

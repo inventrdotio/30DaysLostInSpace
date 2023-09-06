@@ -16,6 +16,7 @@
 /*
  * Arduino concepts introduced/documented in this lesson.
  * - if statement (https://www.arduino.cc/reference/en/language/structure/control-structure/if/)
+ * - else control structure (https://www.arduino.cc/reference/en/language/structure/control-structure/else/)
  * - comparison operator == (https://www.arduino.cc/reference/en/language/structure/comparison-operators/equalto/)
  * - digitalRead() (https://www.arduino.cc/reference/en/language/functions/digital-io/digitalread/)
  *

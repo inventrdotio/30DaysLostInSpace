@@ -1,6 +1,6 @@
 /*
  * 30 Days - Lost in Space
- * Day 3 - I'm Worried About Your Battery Levels
+ * Day 4 - Cabin Lighting
  *
  * Learn more at https://inventr.io/adventure
  *

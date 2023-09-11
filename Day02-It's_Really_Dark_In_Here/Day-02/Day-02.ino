@@ -89,16 +89,21 @@
  * you like you can uncomment the #define (by removing the '//') and commenting out the "const"
  * (by adding '//' to the beginning of the line).
  */
-// #define LANDER_LIGHTS_PIN 12           // The HERO Board Pin to wire to our LED
-const uint8_t LANDER_LIGHTS_PIN = 12;  // The HERO Board Pin to wire to our LED
+// #define CABIN_LIGHTS_PIN 12           // The HERO Board Pin to wire to our LED
+const uint8_t CABIN_LIGHTS_PIN = 12;  // The HERO Board Pin to wire to our LED
 
 // The setup() function is called when a sketch starts. Use it to initialize variables, pin
 // modes, start using libraries, etc. The setup() function will only run once, after each
 // powerup or reset of the Arduino board.
 void setup() {
-  pinMode(LANDER_LIGHTS_PIN, OUTPUT);     // set digital pin defined by LANDER_LIGHTS_PIN as an output pin.
-  digitalWrite(LANDER_LIGHTS_PIN, HIGH);  // Turn on ship's lights
+  pinMode(CABIN_LIGHTS_PIN, OUTPUT);  // set digital pin defined by CABIN_LIGHTS_PIN as an output pin.
 }
 
-// Since we turn on the ship's lights in setup(), there's nothing needed our loop().
-void loop() {}    // Note that a new line isn't required for an empty set of braces.
+// After setup() is executed once the loop() function is called.  Every time it completes it
+// is immediately called again, over and over again.
+void loop() {
+  digitalWrite(CABIN_LIGHTS_PIN, HIGH);  // Turn on ship's lights
+  delay(1000);                           // Delay one second
+  digitalWrite(CABIN_LIGHTS_PIN, LOW);   // Turn off ship's lights briefly
+  delay(100);                            // Shorter delay for off time (1/10 of a second)
+}

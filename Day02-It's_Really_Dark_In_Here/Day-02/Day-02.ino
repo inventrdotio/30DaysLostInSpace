@@ -103,7 +103,7 @@ void setup() {
 // is immediately called again, over and over again.
 void loop() {
   digitalWrite(CABIN_LIGHTS_PIN, HIGH);  // Turn on ship's lights
-  delay(1000);                           // Delay one second
+  delay(1000);                           // Leave light on for one second (1000 microseconds)
   digitalWrite(CABIN_LIGHTS_PIN, LOW);   // Turn off ship's lights briefly
   delay(100);                            // Shorter delay for off time (1/10 of a second)
 }

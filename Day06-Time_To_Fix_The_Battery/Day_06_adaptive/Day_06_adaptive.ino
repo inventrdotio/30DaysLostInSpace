@@ -31,6 +31,9 @@
 
 const uint8_t PHOTORESISTOR_PIN = A0;  // we pick an analog pin (defined in Arduino.h)
 
+const uint16_t MAX_DELAY = 500; // 500 ms longest blink delay
+const uint16_t MIN_DELAY = 50; // 50 ms shortest blink delay
+
 uint16_t darkest_light;
 uint16_t brightest_light;
 
@@ -77,8 +80,8 @@ void loop() {
   if (light_value < darkest_light) {
     darkest_light = light_value;
   }
-  uint16_t delay_value = map(light_value, darkest_light, brightest_light, 500, 50);
-    Serial.print(" -> ");
+  uint16_t delay_value = map(light_value, darkest_light, brightest_light, MAX_DELAY, MIN_DELAY);
+  Serial.print(" -> ");
   Serial.println(delay_value);
 
   // now blink our built in LED using our delay_value.

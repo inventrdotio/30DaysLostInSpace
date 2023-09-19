@@ -10,8 +10,7 @@ void setup() {
  
 void loop() {
   int roomBrightness = analogRead(PHOTORESISTOR_PIN); // Read value from photoresistor
-
-  roomBrightness = roomBrightness * 10;
+  roomBrightness = roomBrightness * 10; // Make the delay longer so you can actually see the change in blinking delays
  
   digitalWrite(LED_BUILTIN, HIGH); // Turn onboard LED on
   delay(roomBrightness); // wait

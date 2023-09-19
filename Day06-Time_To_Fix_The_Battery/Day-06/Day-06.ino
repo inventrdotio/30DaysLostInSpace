@@ -9,13 +9,14 @@ void setup() {
 }
  
 void loop() {
-  int ROOM_BRIGHTNESS = analogRead(PHOTORESISTOR_PIN); // Read value from photoresistor
+  int roomBrightness = analogRead(PHOTORESISTOR_PIN); // Read value from photoresistor
 
+  roomBrightness = roomBrightness * 10;
+ 
   digitalWrite(LED_BUILTIN, HIGH); // Turn onboard LED on
-  delay(ROOM_BRIGHTNESS); // wait
+  delay(roomBrightness); // wait
   digitalWrite(LED_BUILTIN, LOW); // Turn onboard LED off
-  delay(ROOM_BRIGHTNESS); // wait
+  delay(roomBrightness); // wait
 
-  Serial.println(ROOM_BRIGHTNESS); // print value back to computer
-  delay(50); // short delay to help de-clutter serial monitor
+  Serial.println(roomBrightness); // print value back to computer
 }

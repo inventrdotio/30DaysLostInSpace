@@ -32,7 +32,7 @@
 const uint8_t PHOTORESISTOR_PIN = A0;  // we pick an analog pin (defined in Arduino.h)
 
 const uint16_t DARKEST_LIGHT = 0;
-const uint16_t BRIGHTEST_LIGHT = 250;
+const uint16_t BRIGHTEST_LIGHT = 1023;
 
 const uint16_t MAX_DELAY = 500; // 500 ms longest blink delay
 const uint16_t MIN_DELAY = 50; // 50 ms shortest blink delay

@@ -87,10 +87,15 @@ void loop() {
    * Each time through our loop() we will read the current value of our photoresistor.  When
    * the voltage goes up from more light we flash the built-in LED faster (with shorter blinks).
    *
-   * We will use the reading from the PHOTORESISTOR_PIN and modify how long we delay using it.
-   * But we want a SHORTER delay as the value goes UP.  So we will subtrack the reading from
-   * the maximum analog value and use that number for the delay, giving us a faster blink as
-   * read value goes up.
+   * The photoresistor will produce a voltage that is not a simple digitial (on/off, HIGH/LOW)
+   * value.  Because of this we cannot use a digital pin on our HERO.  Luckily our HERO board
+   * provides six "analog" pins, named A0-A5.
+   *
+   * These pins will convert a voltage from 0V to 5V to a number from 0 to 1023, giving us
+   * a full range of values.  Because we are reading an analog value instead of a digital
+   * value, we use the analogRead() function.
+   *
+   * Here we use the reading from the PHOTORESISTOR_PIN and modify how long we delay based on it.
    */
   uint16_t light_value = analogRead(PHOTORESISTOR_PIN);
   /*

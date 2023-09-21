@@ -147,7 +147,7 @@ void loop() {
 
   // now blink our built in LED using our delay_value.
   digitalWrite(LED_BUILTIN, HIGH);  // Turn on LED
-  delay(delay_value);               // Leave on delay_value microseconds
+  delay(delay_value);               // Leave on delay_value milliseconds
   digitalWrite(LED_BUILTIN, LOW);   // Turn off LED
-  delay(delay_value);               // Leave off delay_value microseconds
+  delay(delay_value);               // Leave off delay_value milliseconds
 }

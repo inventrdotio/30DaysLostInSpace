@@ -1,9 +1,9 @@
 // Code written by Alexander Eschenauer for the 30 Day Adventure Kit
 // Learn more at https://inventr.io/adventure
 
-int red = 4;
-int green = 3;
-int blue = 2;
+int red = 11;
+int green = 10;
+int blue = 9;
 
 void setup() {
   pinMode(red, OUTPUT);

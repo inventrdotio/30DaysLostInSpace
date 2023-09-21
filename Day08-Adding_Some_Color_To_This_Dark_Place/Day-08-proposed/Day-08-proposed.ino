@@ -48,11 +48,11 @@ const uint8_t BLUE_PIN = 9;    // pin ccontrolling the blue leg of our RGB LED
  *       that includes any previouly defined constant.  However, the expression cannot
  *       include variables or values that could change during execution.
  */
-const uint8_t OFF = 0;                  // Selected color is OFF
-const uint8_t DIM = 64;                 // Selected color is 1/4 intensity
-constexpr uint8_t BRIGHTER = DIM + 64;  // Selected color is 1/2 intensity
-const uint8_t BRIGHT = BRIGHTER + 64;   // Selected color is 3/4 intensity
-const uint8_t BRIGHTEST = 255;          // Selected color is maximum intensity (255)
+const uint8_t OFF = 0;                 // Selected color is OFF
+const uint8_t DIM = 64;                // Selected color is 1/4 intensity
+const uint8_t BRIGHTER = DIM + 64;     // Selected color is 1/2 intensity
+const uint8_t BRIGHT = BRIGHTER + 64;  // Selected color is 3/4 intensity
+const uint8_t BRIGHTEST = 255;         // Selected color is maximum intensity (255)
 
 // We can change this constant here, in one place, to change how long each color is displayed.
 const uint16_t COLOR_DELAY = 500;  // show each color for 500 milliseconds
@@ -64,31 +64,58 @@ void setup() {
   pinMode(BLUE_PIN, OUTPUT);
 }
 
+// Each time through loop() we display some of the color variations available
+// using an RGB LED.
 void loop() {
-  displayColor(OFF, OFF, OFF);       // OFF!
+  // First demonstrate our different PWM levels by slowly brightening our red LED
+  displayColor(OFF, OFF, OFF);  // OFF!
   delay(COLOR_DELAY);
-  displayColor(DIM, OFF, OFF);       // Display red LED at 1/4 intensity
+  displayColor(DIM, OFF, OFF);  // Display red LED at 1/4 intensity
   delay(COLOR_DELAY);
-  displayColor(BRIGHTER, OFF, OFF);   // Display red LED at 1/2 intensity
+  displayColor(BRIGHTER, OFF, OFF);  // Display red LED at 1/2 intensity
   delay(COLOR_DELAY);
-  displayColor(BRIGHT, OFF, OFF);     // Display red LED at 3/4 intensity
+  displayColor(BRIGHT, OFF, OFF);  // Display red LED at 3/4 intensity
   delay(COLOR_DELAY);
   displayColor(BRIGHTEST, OFF, OFF);  // Display red LED at FULL intensity
   delay(COLOR_DELAY);
-  displayColor(OFF, BRIGHT, OFF);     // Display the green LED
+
+  // Display our other two LED colors at half intensity
+  displayColor(OFF, BRIGHT, OFF);  // Display the green LED
   delay(COLOR_DELAY);
-  displayColor(OFF, OFF, BRIGHT);     // Display the blue LED
+  displayColor(OFF, OFF, BRIGHT);  // Display the blue LED
   delay(COLOR_DELAY);
-  displayColor(OFF, BRIGHT, BRIGHT);  // Display yellow by mixing green and blue LEDs
+
+  // Now show various colors (at half intensity) by mixing our three colors
+  displayColor(BRIGHT, BRIGHT, OFF);  // Display yellow by mixing red and green LEDs
+  delay(COLOR_DELAY);
+  displayColor(OFF, BRIGHT, BRIGHT);  // Display cyan by mixing green and blue LEDs
   delay(COLOR_DELAY);
   displayColor(BRIGHT, OFF, BRIGHT);  // Display magenta by mixing red and blue LEDs
   delay(COLOR_DELAY);
+
+  // Display all of our LEDs to get white.
   displayColor(BRIGHT, BRIGHT, BRIGHT);  // white
   delay(COLOR_DELAY);
 }
 
-void displayColor(uint8_t red_intensity, uint8_t green_intensity, uint8_t blue_intensity) {
-  analogWrite(RED_PIN, red_intensity);
-  analogWrite(GREEN_PIN, green_intensity);
-  analogWrite(BLUE_PIN, blue_intensity);
+/*
+ * displayColor() is a function that accepts three parameters representing the desired
+ * intensity for each of the LEDs in the RGB LED.
+ *
+ * Each parameter passed must have a type (here we match what analogWrite() will use) and
+ * a name to be used inside the function to refer to the parameter.  The parameters can all
+ * be included on a single line like:
+ * void displayColor( uint8_t red_intensity, uint8_t green_intensity, uint8_t blue_intensity) {
+ * 
+ * However, if we display each parameter on it's own line we can add a comment to each
+ * for additional clarity.
+ */
+void displayColor(
+  uint8_t red_intensity,    // red LED intensity (0-255)
+  uint8_t green_intensity,  // green LED intensity (0-255)
+  uint8_t blue_intensity    // blue LED intensity (0-255)
+) {
+  analogWrite(RED_PIN, red_intensity);      // Set red LED intensity using PWM
+  analogWrite(GREEN_PIN, green_intensity);  // Set green LED intensity using PWM
+  analogWrite(BLUE_PIN, blue_intensity);    // Set blue LED intensity using PWM
 }

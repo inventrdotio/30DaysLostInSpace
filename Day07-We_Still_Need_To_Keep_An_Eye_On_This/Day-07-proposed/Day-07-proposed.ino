@@ -27,7 +27,7 @@
 // Our photoresistor will give us a reading of the current light level on this analog pin
 const uint8_t PHOTORESISTOR_PIN = A0;  // Photoresistor analog pin
 
-// Use an unsigned, 16 bit value for maximum battery capacity
+// Use an unsigned, 16 bit value (0 - 65535) for maximum battery capacity
 const uint16_t BATTERY_CAPACITY = 50000;  // Maximum battery capacity
 
 // Use global unsigned, 16 bit variable (uint16_t) to track the current battery level

@@ -11,15 +11,14 @@ int red = 11;
 int green = 10;
 int blue = 9;
 
-void RGB_color(int red_value, int green_value, int blue_value)
- {
+void RGB_color(int red_value, int green_value, int blue_value) {
   analogWrite(red, red_value);
   analogWrite(green, green_value);
   analogWrite(blue, blue_value);
 }
 
 double getBatteryPercentage() {
-  return (((double)batteryLevel / (double)batteryCapacity)*100);
+  return (((double)batteryLevel / (double)batteryCapacity) * 100);
 }
 
 void setup() {
@@ -33,27 +32,23 @@ void setup() {
 }
 
 void loop() {
-  sensorValue = analogRead(sensorPin); // read the value from the sensor:
+  sensorValue = analogRead(sensorPin);  // read the value from the sensor:
   batteryLevel += sensorValue;
 
   double percentage = getBatteryPercentage();
 
   if (percentage >= 100) {
-    RGB_color(0, 125, 0); // Green
-    batteryLevel = batteryCapacity; // to prevent integer overflow errors
-    percentage = 100; // to prevent from displaying over 100%
-  } 
-  else if (percentage > 0 && percentage <= 25)
-  {
-    RGB_color(125, 0, 0); // red
+    RGB_color(0, 125, 0);            // Green
+    batteryLevel = batteryCapacity;  // to prevent integer overflow errors
+    percentage = 100;                // to prevent from displaying over 100%
+  } else if (percentage > 0 && percentage <= 25) {
+    RGB_color(125, 0, 0);  // red
+  } else if (percentage > 25 && percentage <= 50) {
+    RGB_color(125, 80, 0);  // yellow-ish
+  } else if (percentage > 50 && percentage <= 75) {
+    RGB_color(0, 125, 125);  // blue-ish
   }
-  else if (percentage > 25 && percentage <= 50){
-    RGB_color(125, 80, 0); // yellow-ish
-  }
-  else if (percentage > 50 && percentage <= 75) {
-    RGB_color(0, 125, 125); // blue-ish
-  }
-  
+
   Serial.print(percentage);
   Serial.println("%");
 

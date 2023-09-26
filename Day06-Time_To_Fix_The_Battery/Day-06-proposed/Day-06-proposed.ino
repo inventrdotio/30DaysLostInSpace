@@ -37,20 +37,6 @@ const uint8_t PHOTORESISTOR_PIN = A0;  // we pick an analog pin (defined in Ardu
 const uint16_t MIN_DELAY = 50;   // 50 ms shortest blink delay
 const uint16_t MAX_DELAY = 500;  // 500 ms longest blink delay
 
-/*
- * As our loop() function is repeatedly called we need to keep track of the darkest
- * light reading and our brightest so that we can set our blink rate based on changing
- * light levels from darkest seen to brightest.
- *
- * These need to be defined outside of loop() so that they will retain their values
- * between loop() runs.  Because they are always available, they are called "global"
- * variables.
- *
- * Note that they have NO initial value, and we will set that in our setup() function.
- */
-uint16_t darkest_light;    // this is the lowest value returned by the photoresistor
-uint16_t brightest_light;  // this is the highest value returned by the photoresistor
-
 // One time setup
 void setup() {
   // We will blink our build in LED based on amount of light received from our photoresistor
@@ -68,17 +54,6 @@ void setup() {
    * second.
    */
   Serial.begin(9600);  // This initializes the Serial Monitor and sets the speed to 9600 bits per second
-
-  /*
-   * We don't know what to expect for an initial light level from our photoresistor so
-   * we will set our darkest and brightest value by reading the current photoresistor value
-   * when setup() is executed.
-   *
-   * NOTE: This also shows how you can set *multiple* variables to the same value by
-   *       "chaining" the '=' operator together.  This sets BOTH variables to the initial
-   *       value.
-   */
-  darkest_light = brightest_light = analogRead(PHOTORESISTOR_PIN);
 }
 
 // The loop() function is called over and over when sketch is run.
@@ -98,6 +73,7 @@ void loop() {
    * Here we use the reading from the PHOTORESISTOR_PIN and modify how long we delay based on it.
    */
   uint16_t light_value = analogRead(PHOTORESISTOR_PIN);
+
   /*
    * Our HERO board doesn't have a text display, so the Arduino IDE has provided us a way to
    * for the HERO to send messages that are displayed in a window in the Arduino IDE.  To open
@@ -115,6 +91,24 @@ void loop() {
    */
   Serial.print("Light value: ");  // Display label string to serial monitor
   Serial.print(light_value);      // display the value read from our photoresistor
+
+  /*
+   * The flash rate varies based on the relative brightness received by the photoresistor.
+   * However, your brightness levels could be very different if you are in a dark room from
+   * running this in a bright sunny room.  Because of this we will save the darkest value
+   * and the brightest value seen.
+   *
+   * These values would normally be lost when each run of our loop() ends, but by adding
+   * the "static" declaration we indicate that these local variables should maintain their
+   * values between loop() runs.
+   *
+   * The FIRST time these variables are used they will get initialized with the first light_value
+   * but that initialization is only done the first time so they will retain any changes
+   * between the loop() runs.
+   */
+  static uint16_t darkest_light = light_value;    // this is the lowest value returned by the photoresistor
+  static uint16_t brightest_light = light_value;  // this is the highest value returned by the photoresistor
+
   /*
    * Now that we have a light value let's update our darkest and brightest values
    * if the current value is darker (less than) our previous darkest or brighter

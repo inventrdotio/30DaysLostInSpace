@@ -30,10 +30,6 @@ const uint8_t PHOTORESISTOR_PIN = A0;  // Photoresistor analog pin
 // Use an unsigned, 16 bit value (0 - 65535) for maximum battery capacity
 const uint16_t BATTERY_CAPACITY = 50000;  // Maximum battery capacity
 
-// Use global unsigned, 16 bit variable (uint16_t) to track the current battery level
-// This is a global because we need the value to be saved between loop() runs.
-uint16_t battery_level = 0;  // Current battery charge level (set to 0 at start)
-
 void setup() {
   pinMode(PHOTORESISTOR_PIN, INPUT);  // Input current light level from photoresistor
 
@@ -47,6 +43,10 @@ void setup() {
  * We then display current charge level on the Serial Monitor.
  */
 void loop() {
+  // Use static because we need this variable to maintain it's value across
+  // multiple loop() runs.
+  static uint16_t battery_level = 0;  // Current battery charge level (set to 0 first time)
+
   // Display battery information on the Serial Monitor
   if (battery_level < BATTERY_CAPACITY) {  // If battery is not fully charged..
     /*

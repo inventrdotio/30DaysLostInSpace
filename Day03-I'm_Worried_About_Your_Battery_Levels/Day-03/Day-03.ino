@@ -27,20 +27,20 @@
 
 #include "Arduino.h"  // include information about our HERO
 
-const uint8_t CABIN_LIGHTS_PIN = 12;  // Control our lander's lights using the HERO's pin 12
-const uint8_t CABIN_LIGHTS_SWITCH_PIN = 2;    // Connect our light switch to pin 2
+#define CABIN_LIGHTS_PIN 12        // Control our lander's lights using the HERO's pin 12
+#define CABIN_LIGHTS_SWITCH_PIN 2  // Connect our light switch to pin 2
 
 // setup() gets called ONCE when our sketch is first run (after upload, when power is
 // restored, or when the HERO's reset button is pressed)
 void setup() {
-  pinMode(CABIN_LIGHTS_PIN, OUTPUT);  // Set light control pin as an OUTPUT
-  pinMode(CABIN_LIGHTS_SWITCH_PIN, INPUT);    // Since we read from the switch, this pin is an INPUT
+  pinMode(CABIN_LIGHTS_PIN, OUTPUT);        // Set light control pin as an OUTPUT
+  pinMode(CABIN_LIGHTS_SWITCH_PIN, INPUT);  // Since we read from the switch, this pin is an INPUT
 }
 
 // After setup() is executed once the loop() function is called.  Every time it completes it
 // is immediately called again, over and over again.
 void loop() {
-/*
+  /*
   // First version of our loop.  It works, but could be shorter, more efficient and
   // more understandable.  Commented out but left in to show how we can incrementally
   // improve our code.
@@ -58,7 +58,7 @@ void loop() {
   }
 */
 
-/*
+  /*
   // Second version of our loop.  Better.  Define the variable and set it in the same statement
   // and then use the else statement to show that we should always execute ONE of our two
   // actions.

@@ -35,10 +35,6 @@ const uint8_t BLUE_PIN = 9;    // pin ccontrolling the blue leg of our RGB LED
 
 const uint16_t BATTERY_CAPACITY = 50000;  // Maximum battery capacity
 
-// Use global unsigned, 16 bit variable (uint16_t) to track the current battery level
-// This is a global because we need the value to be saved between loop() runs.
-uint16_t battery_level = 0;  // Current battery charge level (set to 0 at start)
-
 /*
  * Display a color on our RGB LED by providing an intensity for
  * our red, green and blue LEDs.
@@ -99,6 +95,10 @@ void setup() {
 }
 
 void loop() {
+  // Use static because we need this variable to maintain it's value across
+  // multiple loop() runs.
+  static uint16_t battery_level = 0;  // Current battery charge level (set to 0 first time used)
+
   battery_level += analogRead(PHOTORESISTOR_PIN);  // Add current "charge amount" to our battery
 
   // We can't charge the battery higher than it's capacity, set level as full if it goes over
@@ -106,24 +106,7 @@ void loop() {
     battery_level = BATTERY_CAPACITY;
   }
 
-  /*
-   * Pass our battery level to getBatteryPercentage() and save the value into a "float"
-   *
-   * NOTE: In this sketch our battery level is saved into a global variable because it
-   *       needs to be saved between loop() executions.  Our battery capacity is a constant
-   *       so it's also availble anywhere in our sketch.  So, why don't we avoid the
-   *       additional complexity of passing these values in as parameters?
-   *
-   *       Our lander may have many batteries and we may wish to get a percentage from
-   *       each.  By passing in parameters we don't limit our function to just knowing
-   *       about one battery and we could do something like:
-   *
-   *       battery_percentage_1 = getBatteryPercentage(battery1_level, battery1_capacity);
-   *       battery_percentage_2 = getBatteryPercentage(battery2_level, battery2_capacity);
-   *
-   *       That is a lot more useful than just writing a function that can only be used for
-   *       ONE specific situation.
-   */
+  // Compute battery charge percentage from our function
   float percentage = getBatteryPercentage(battery_level, BATTERY_CAPACITY);
 
   if (percentage >= 50) {     // battery level is OK, display green

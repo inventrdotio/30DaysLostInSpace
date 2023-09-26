@@ -1,4 +1,4 @@
-/* <-- Hi there! The lines of text inside these symbols are just notes for us humans to read.
+/* <-- Hi there! The lines of text inside these symbols are just notes for us humans to read.0000
  * They help us understand what the code is doing. The Arduino doesn't read these notes at all.
  * 
  * Our project: "30 Days - Lost in Space"
@@ -32,7 +32,7 @@
  * - Functions: These are chunks of code that perform a specific task.
  */
 
-/* We start by including this line of code, which helps our HERO work properly with the Arduino program. */
+// We start by including this line of code, which helps our HERO work properly with the Arduino program.
 #include "Arduino.h"
 
 /*
@@ -43,11 +43,14 @@
  * makes our code easier to read and change later if needed. For example, instead of remembering a pin
  * number, we can just give it a nickname like CABIN_LIGHTS_PIN.
  *
- * We're going to use 'const' to give a nickname to our pin. This means that the nickname can't be changed
- * later in our code, and it helps us avoid making mistakes. You'll notice that the nickname is in capital letters,
+ * One way to define constants is by using a command called #define.  Using this we can give a name
+ * (or nickname) to the value that follows the name. You'll notice that the nickname is in capital letters,
  * which is a way to remind us that it's a constant and can't change.
+ *
+ * In this #define we give the name "CABIN_LIGHTS_PIN" the value of "12".  Whenever you see
+ * in this sketch it will have the value of "12".
  */
-const uint8_t CABIN_LIGHTS_PIN = 12;  // This is the nickname for the pin connected to our LED.
+#define CABIN_LIGHTS_PIN 12   // This is the nickname for the pin connected to our LED.
 
 /*
  * The setup function is where we prepare everything before we start. We only run this function once each

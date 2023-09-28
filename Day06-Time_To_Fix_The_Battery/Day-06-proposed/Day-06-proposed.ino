@@ -16,6 +16,7 @@
 
 /*
  * Arduino concepts introduced/documented in this lesson.
+ * - unsigned int: A 16 bit value containing numbers from 0 to 65535
  * - Serial Monitor: Allows the HERO to display text in an Arduino IDE window.
  * - Serial.begin(): Used to initialize the Serial Monitor.
  * - Serial.print(): Display some text in the Arduino IDE Serial Monitor window.
@@ -31,11 +32,14 @@
 #include "Arduino.h"
 
 // Our photoresistor will give us a reading of the current light level on this analog pin
-const uint8_t PHOTORESISTOR_PIN = A0;  // we pick an analog pin (defined in Arduino.h)
+const byte PHOTORESISTOR_PIN = A0;  // we pick an analog pin (defined in Arduino.h)
 
 // These two constants set the minimum and maximum delay times for oue blinking LED
-const uint16_t MIN_DELAY = 50;   // 50 ms shortest blink delay
-const uint16_t MAX_DELAY = 500;  // 500 ms longest blink delay
+// The type "unsigned int" represents numbers from 0 to 65535.  Another name you may
+// see for this type is "uint16_t".  We need this since these delay values can be
+// greater than the biggest number a byte can represent (255).
+const unsigned int MIN_DELAY = 50;   // 50 ms shortest blink delay
+const unsigned int MAX_DELAY = 500;  // 500 ms longest blink delay
 
 // One time setup
 void setup() {
@@ -72,7 +76,7 @@ void loop() {
    *
    * Here we use the reading from the PHOTORESISTOR_PIN and modify how long we delay based on it.
    */
-  uint16_t light_value = analogRead(PHOTORESISTOR_PIN);
+  unsigned int light_value = analogRead(PHOTORESISTOR_PIN);   // light value from 0 to 1024
 
   /*
    * Our HERO board doesn't have a text display, so the Arduino IDE has provided us a way to
@@ -106,8 +110,8 @@ void loop() {
    * but that initialization is only done the first time so they will retain any changes
    * between the loop() runs.
    */
-  static uint16_t darkest_light = light_value;    // this is the lowest value returned by the photoresistor
-  static uint16_t brightest_light = light_value;  // this is the highest value returned by the photoresistor
+  static unsigned int darkest_light = light_value;    // this is the lowest value returned by the photoresistor
+  static unsigned int brightest_light = light_value;  // this is the highest value returned by the photoresistor
 
   /*
    * Now that we have a light value let's update our darkest and brightest values
@@ -135,7 +139,7 @@ void loop() {
    * We introduce it's used here to map our light_value (which goes from darkest_light to
    * brightest_light) and return a value from MAX_DELAY *down* to MIN_DELAY.  Perfect!
    */
-  uint16_t delay_value = map(light_value, darkest_light, brightest_light, MAX_DELAY, MIN_DELAY);
+  unsigned int delay_value = map(light_value, darkest_light, brightest_light, MAX_DELAY, MIN_DELAY);
   Serial.print(", Delay value: ");  // display label after light_value
   Serial.println(delay_value);      // display delay_value returned by map() function with newline
 

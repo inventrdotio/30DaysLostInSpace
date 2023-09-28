@@ -26,23 +26,23 @@
 #include "Arduino.h"
 
 // Our photoresistor will give us a reading of the current light level on this analog pin
-const uint8_t PHOTORESISTOR_PIN = A0;  // Photoresistor analog pin
+const byte PHOTORESISTOR_PIN = A0;  // Photoresistor analog pin
 
 // RGB LED pins
-const uint8_t RED_PIN = 11;    // pin controlling the red leg of our RGB LED
-const uint8_t GREEN_PIN = 10;  // pin ccontrolling the green leg of our RGB LED
-const uint8_t BLUE_PIN = 9;    // pin ccontrolling the blue leg of our RGB LED
+const byte RED_PIN = 11;    // pin controlling the red leg of our RGB LED
+const byte GREEN_PIN = 10;  // pin ccontrolling the green leg of our RGB LED
+const byte BLUE_PIN = 9;    // pin ccontrolling the blue leg of our RGB LED
 
-const uint16_t BATTERY_CAPACITY = 50000;  // Maximum battery capacity
+const unsigned long BATTERY_CAPACITY = 50000;  // Maximum battery capacity
 
 /*
  * Display a color on our RGB LED by providing an intensity for
  * our red, green and blue LEDs.
  */
 void displayColor(
-  uint8_t red_intensity,    // red LED intensity (0-255)
-  uint8_t green_intensity,  // green LED intensity (0-255)
-  uint8_t blue_intensity    // blue LED intensity (0-255)
+  byte red_intensity,    // red LED intensity (0-255)
+  byte green_intensity,  // green LED intensity (0-255)
+  byte blue_intensity    // blue LED intensity (0-255)
 ) {
   analogWrite(RED_PIN, red_intensity);      // write red LED intensity using PWM
   analogWrite(GREEN_PIN, green_intensity);  // write green LED intensity using PWM
@@ -61,8 +61,8 @@ void displayColor(
  *       is a "floating point" number that can contain a decimal point (like 12.34).
  */
 float getBatteryPercentage(
-  uint16_t current_battery_level,  // Current battery level
-  uint16_t battery_capacity        // Total battery capacity
+  unsigned long current_battery_level,  // Current battery level
+  unsigned long battery_capacity        // Total battery capacity
 ) {
   /*
    * IMPORTANT NOTE:
@@ -97,7 +97,7 @@ void setup() {
 void loop() {
   // Use static because we need this variable to maintain it's value across
   // multiple loop() runs.
-  static uint16_t battery_level = 0;  // Current battery charge level (set to 0 first time used)
+  static unsigned long battery_level = 0;  // Current battery charge level (set to 0 first time used)
 
   battery_level += analogRead(PHOTORESISTOR_PIN);  // Add current "charge amount" to our battery
 

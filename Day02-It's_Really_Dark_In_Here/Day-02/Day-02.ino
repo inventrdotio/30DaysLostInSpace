@@ -1,4 +1,4 @@
-/* <-- Hi there! The lines of text inside these symbols are just notes for us humans to read.0000
+/* <-- Hi there! The lines of text inside these symbols are just notes for us humans to read.
  * They help us understand what the code is doing. The Arduino doesn't read these notes at all.
  * 
  * Our project: "30 Days - Lost in Space"

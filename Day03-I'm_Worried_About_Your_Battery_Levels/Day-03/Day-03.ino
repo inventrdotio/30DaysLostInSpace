@@ -40,12 +40,12 @@ void setup() {
 // After setup() is executed once the loop() function is called.  Every time it completes it
 // is immediately called again, over and over again.
 void loop() {
-  /*
+/*
   // First version of our loop.  It works, but could be shorter, more efficient and
   // more understandable.  Commented out but left in to show how we can incrementally
   // improve our code.
 
-  int switch_setting;
+  byte switch_setting;
 
   switch_setting = digitalRead(CABIN_LIGHTS_SWITCH_PIN);   // Read state of light switch
 
@@ -58,12 +58,12 @@ void loop() {
   }
 */
 
-  /*
+/*
   // Second version of our loop.  Better.  Define the variable and set it in the same statement
   // and then use the else statement to show that we should always execute ONE of our two
   // actions.
 
-  int switch_setting = digitalRead(CABIN_LIGHTS_SWITCH_PIN);
+  byte switch_setting = digitalRead(CABIN_LIGHTS_SWITCH_PIN);
 
   if (switch_setting == HIGH) {
     digitalWrite(CABIN_LIGHTS_PIN, HIGH);  // Switch is ON, turn on our lander's light

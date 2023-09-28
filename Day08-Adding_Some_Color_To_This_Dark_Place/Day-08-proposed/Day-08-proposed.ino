@@ -34,9 +34,9 @@
  *       indicated on the board by preceding those pin numbers on the HERO board
  *       with a tilde ('~') character.  Only those pins support PWM and analogWrite().
  */
-const uint8_t RED_PIN = 11;    // pin controlling the red leg of our RGB LED
-const uint8_t GREEN_PIN = 10;  // pin ccontrolling the green leg of our RGB LED
-const uint8_t BLUE_PIN = 9;    // pin ccontrolling the blue leg of our RGB LED
+const byte RED_PIN = 11;    // pin controlling the red leg of our RGB LED
+const byte GREEN_PIN = 10;  // pin ccontrolling the green leg of our RGB LED
+const byte BLUE_PIN = 9;    // pin ccontrolling the blue leg of our RGB LED
 
 /*
  * Define a set of constants to represent 4 different brightness levels for our
@@ -48,14 +48,14 @@ const uint8_t BLUE_PIN = 9;    // pin ccontrolling the blue leg of our RGB LED
  *       that includes any previouly defined constant.  However, the expression cannot
  *       include variables or values that could change during execution.
  */
-const uint8_t OFF = 0;                 // Selected color is OFF
-const uint8_t DIM = 64;                // Selected color is 1/4 intensity
-const uint8_t BRIGHTER = DIM + 64;     // Selected color is 1/2 intensity
-const uint8_t BRIGHT = BRIGHTER + 64;  // Selected color is 3/4 intensity
-const uint8_t BRIGHTEST = 255;         // Selected color is maximum intensity (255)
+const byte OFF = 0;                 // Selected color is OFF
+const byte DIM = 64;                // Selected color is 1/4 intensity
+const byte BRIGHTER = DIM + 64;     // Selected color is 1/2 intensity
+const byte BRIGHT = BRIGHTER + 64;  // Selected color is 3/4 intensity
+const byte BRIGHTEST = 255;         // Selected color is maximum intensity (255)
 
 // We can change this constant here, in one place, to change how long each color is displayed.
-const uint16_t COLOR_DELAY = 500;  // show each color for 500 milliseconds
+const unsigned int COLOR_DELAY = 500;  // show each color for 500 milliseconds
 
 void setup() {
   // Set each of our PWM pins as OUTPUT pins
@@ -105,15 +105,15 @@ void loop() {
  * Each parameter passed must have a type (here we match what analogWrite() will use) and
  * a name to be used inside the function to refer to the parameter.  The parameters can all
  * be included on a single line like:
- * void displayColor( uint8_t red_intensity, uint8_t green_intensity, uint8_t blue_intensity) {
+ * void displayColor( byte red_intensity, byte green_intensity, byte blue_intensity) {
  * 
  * However, if we display each parameter on it's own line we can add a comment to each
  * for additional clarity.
  */
 void displayColor(
-  uint8_t red_intensity,    // red LED intensity (0-255)
-  uint8_t green_intensity,  // green LED intensity (0-255)
-  uint8_t blue_intensity    // blue LED intensity (0-255)
+  byte red_intensity,    // red LED intensity (0-255)
+  byte green_intensity,  // green LED intensity (0-255)
+  byte blue_intensity    // blue LED intensity (0-255)
 ) {
   analogWrite(RED_PIN, red_intensity);      // Set red LED intensity using PWM
   analogWrite(GREEN_PIN, green_intensity);  // Set green LED intensity using PWM

@@ -1,6 +1,6 @@
 /*
  * 30 Days - Lost in Space
- * Day 8 - A Better Way to Do Things
+ * Day 11 - Starting your control panel
  *
  * Learn more at https://inventr.io/adventure
  *
@@ -25,7 +25,6 @@
  *              can be accessed using an index.  Arrays can be one dimensional
  *              like a list (with one index) or two dimensional like a spreadsheet
  *              table with rows and columns (using row and column indexes).
- *
  *
  * Parts and electronics concepts introduced in this lesson.
  */

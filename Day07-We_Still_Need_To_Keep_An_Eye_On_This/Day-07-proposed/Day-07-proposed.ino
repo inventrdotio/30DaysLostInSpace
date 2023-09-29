@@ -36,6 +36,10 @@ void setup() {
   Serial.begin(9600);  // Initialize Serial Monitor to 9600 baud
 }
 
+// Use global here because this variable is accessed by both loop() and our custom
+// function.  (In later lessons we will show how to avoid globals.)
+unsigned int battery_level = 0;  // Current battery charge level (set to 0 first time)
+
 /*
  * Each time through our loop() we read the current light level from the photoresistor
  * and add that to our current battery level to simulate charging our battery.
@@ -43,9 +47,6 @@ void setup() {
  * We then display current charge level on the Serial Monitor.
  */
 void loop() {
-  // Use static because we need this variable to maintain it's value across
-  // multiple loop() runs.
-  static unsigned int battery_level = 0;  // Current battery charge level (set to 0 first time)
 
   // Display battery information on the Serial Monitor
   if (battery_level < BATTERY_CAPACITY) {  // If battery is not fully charged..

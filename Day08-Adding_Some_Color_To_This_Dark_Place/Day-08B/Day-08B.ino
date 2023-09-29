@@ -30,7 +30,7 @@ void loop() {
 // how much of the time (0-255) each pin should be GROUNDED.  Our loop() sets how
 // intense each light should be, so here we will subtract each value from 255
 // to get the GROUNDED time.
-void RGB_color(uint8_t red_value, uint8_t green_value, uint8_t blue_value) {
+void RGB_color(byte red_value, byte green_value, byte blue_value) {
   analogWrite(red, 255 - red_value);
   analogWrite(green, 255 - green_value);
   analogWrite(blue, 255 - blue_value);

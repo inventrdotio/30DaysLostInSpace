@@ -67,7 +67,7 @@ void loop() {
 
   if (button_character == '#') {  // button to access_allowed system
     bool access_allowed = validatePIN();
-    if (access_allowed < 0) {
+    if (access_allowed) {
       Serial.println("Access Denied.");
     } else {
       Serial.println("Welcome, authorized user. You may now begin using the system.");

@@ -68,9 +68,10 @@ void loop() {
   if (button_character == '#') {  // button to access_allowed system
     bool access_allowed = validatePIN();
     if (access_allowed) {
-      Serial.println("Access Denied.");
-    } else {
       Serial.println("Welcome, authorized user. You may now begin using the system.");
+    } else {
+      Serial.println("Access Denied.");
+      Serial.println("\nPress * to enter new PIN or # to access the system.");
     }
   }
 
@@ -93,6 +94,7 @@ void loop() {
       Serial.println("PIN Successfully Changed!");
     } else {
       Serial.println("Access Denied. Cannot change PIN without the old or default.");
+      Serial.println("\nPress * to enter new PIN or # to access the system.");
     }
   }
 }

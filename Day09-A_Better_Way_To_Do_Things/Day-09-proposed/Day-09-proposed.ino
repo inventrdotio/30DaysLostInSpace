@@ -16,7 +16,6 @@
 /*
  * Arduino concepts introduced/documented in this lesson.
  * - float:   Variable type for decimal numbers that include a decimal point
- * - return:  Used by functions to return a single value
  * - else if: Control structure for making multiple if decisions together
  *
  * Parts and electronics concepts introduced in this lesson.
@@ -49,41 +48,6 @@ void displayColor(
   analogWrite(BLUE_PIN, blue_intensity);    // write blue LED intensity using PWM
 }
 
-/*
- * This function accepts our current battery level as a parameter calculates
- * how full our battery is by dividing by the battery capacity.  That value
- * is then multiplied by 100 to give us a percentage.
- *
- * NOTE: this function introduces the concept of a function that returns a single
- *       value.  First, we must indicate what type of value that will be returned
- *       in the initial function declaration.  The "float" at the beginning of
- *       the declaration indicates that this function will return a "float", which
- *       is a "floating point" number that can contain a decimal point (like 12.34).
- */
-float getBatteryPercentage(
-  unsigned long current_battery_level,  // Current battery level
-  unsigned long battery_capacity        // Total battery capacity
-) {
-  /*
-   * IMPORTANT NOTE:
-   * If you perform an operation using integer arithemetic each value is not
-   * automatically converted to a floating point (decimal) number.
-   *
-   * In the calculation below, if we divide the integer current battery value by the
-   * integer battery capacity (current_battery_level / BATTERY_CAPACITY) then the result
-   * would ALWAYS be 0, even if that 0 gets converted afterwards to a decimal (0.0).
-   *
-   * To avoid this, we use the "(float)" declaration before each of our values to
-   * instruct the compiler to FIRST convert the value to floating point before
-   * any calculation.
-   *
-   * If our current_battery_level is less than the battery capacity the initial
-   * calculation gives us a number from 0.0 to 1.0.  We then multiple by 100 to
-   * get a percentage value from 0.0 up to 100.0 and return that value to the caller.
-   */
-  return (((float)current_battery_level / (float)battery_capacity) * 100);
-}
-
 void setup() {
   // Declare the RGB LED pins as outputs:
   pinMode(RED_PIN, OUTPUT);
@@ -106,12 +70,30 @@ void loop() {
     battery_level = BATTERY_CAPACITY;
   }
 
-  // Compute battery charge percentage from our function
-  float percentage = getBatteryPercentage(battery_level, BATTERY_CAPACITY);
+  /*
+   * IMPORTANT NOTE:
+   * If you perform an operation using integer arithemetic each value is not
+   * automatically converted to a floating point (decimal) number.
+   *
+   * In the calculation below, if we divide the integer battery value by the
+   * integer battery capacity (battery_level / BATTERY_CAPACITY) then the result
+   * would ALWAYS be 0, even if that 0 gets converted afterwards to a float (0.0).
+   *
+   * To avoid this, we use the "(float)" declaration before each of our values to
+   * instruct the compiler to FIRST convert the value to floating point and then
+   * perform the calculation using floating point math.
+   *
+   * If our current_battery_level is less than the battery capacity the initial
+   * calculation gives us a number from 0.0 to 1.0.  We then multiple by 100 to
+   * get a percentage value from 0.0 up to 100.0.
+   */
 
-  if (percentage >= 50) {     // battery level is OK, display green
+  // Compute battery charge percentage from our function
+  float percentage = ((float)battery_level / (float)BATTERY_CAPACITY) * 100;
+
+  if (percentage >= 50.0) {     // battery level is OK, display green
     displayColor(0, 128, 0);  // display green
-  } else if (percentage >= 25 && percentage < 50) {
+  } else if (percentage >= 25.0 && percentage < 50.0) {
     displayColor(128, 80, 0);  // display yellow-ish/amber for early warning
   } else {                     // Level must be less than 25%, display "pulsating" red
     // To pulsate the red light we briefly turn the LED off and then display red, giving it

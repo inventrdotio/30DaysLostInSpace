@@ -30,13 +30,14 @@
 // Include Keypad library#include <Keypad.h>
 #include <Keypad.h>
 
+// Our HERO keypad has 4 rows, each with 4 columns.
 const byte ROWS = 4;
 const byte COLS = 4;
 
-const byte PIN_LENGTH = 4;
+const byte PIN_LENGTH = 4;    // PIN code is 4 button presses
+char current_pin[PIN_LENGTH] = { '0', '0', '0', '0' }; // Initial PIN is four zeros.
 
-char PASSWORD[PIN_LENGTH] = { '0', '0', '0', '0' };
-
+// Define what characters will be returned by each button
 const char BUTTONS[ROWS][COLS] = {
   { '1', '2', '3', 'A' },
   { '4', '5', '6', 'B' },
@@ -44,10 +45,11 @@ const char BUTTONS[ROWS][COLS] = {
   { '*', '0', '#', 'D' }
 };
 
+// Define row and column pins connected to the keypad
 const byte ROW_PINS[ROWS] = { 5, 4, 3, 2 };
 const byte COL_PINS[COLS] = { 6, 7, 8, 9 };
 
-Keypad customKeypad = Keypad(makeKeymap(BUTTONS), ROW_PINS, COL_PINS, ROWS, COLS);
+Keypad heroKeypad = Keypad(makeKeymap(BUTTONS), ROW_PINS, COL_PINS, ROWS, COLS);
 
 const byte BUZZER_PIN = 10;  // pin 10 drives the buzzer
 
@@ -60,12 +62,12 @@ void setup() {
 }
 
 void loop() {
-  char button_character = customKeypad.waitForKey();
+  char button_character = heroKeypad.waitForKey();
 
   // Serial.println(button_character);
   tone(BUZZER_PIN, 880, 100);
 
-  if (button_character == '#') {  // button to access_allowed system
+  if (button_character == '#') {  // button to access system
     bool access_allowed = validatePIN();
     if (access_allowed) {
       Serial.println("Welcome, authorized user. You may now begin using the system.");
@@ -75,18 +77,17 @@ void loop() {
     }
   }
 
-  if (button_character == '*') {  // button to change PASSWORD
+  if (button_character == '*') {  // button to change PIN
     bool access_allowed = validatePIN();
 
     if (access_allowed) {
-      Serial.println("Welcome, authorized user. Please Enter a new PASSWORD: ");
-      delay(500);
+      Serial.println("Welcome, authorized user. Please Enter a new PIN: ");
 
       for (int i = 0; i < PIN_LENGTH; i++) {
-        button_character = customKeypad.waitForKey();
+        button_character = heroKeypad.waitForKey();
         tone(BUZZER_PIN, 880, 100);
 
-        PASSWORD[i] = button_character;
+        current_pin[i] = button_character;
         Serial.print("*");
       }
 
@@ -114,10 +115,10 @@ bool validatePIN() {
   Serial.println("Enter PIN to continue.");
 
   for (int i = 0; i < PIN_LENGTH; i++) {
-    char button_character = customKeypad.waitForKey();
+    char button_character = heroKeypad.waitForKey();
     tone(BUZZER_PIN, 880, 100);
 
-    if (PASSWORD[i] != button_character) {
+    if (current_pin[i] != button_character) {
       Serial.println();  // start next message on new line
       Serial.print("WRONG PIN DIGIT: ");
       Serial.println(button_character);

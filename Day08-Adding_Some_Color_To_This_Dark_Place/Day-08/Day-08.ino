@@ -34,9 +34,9 @@
  *       indicated on the board by preceding those pin numbers on the HERO board
  *       with a tilde ('~') character.  Only those pins support PWM and analogWrite().
  */
-const byte RED_PIN = 11;    // pin controlling the red leg of our RGB LED
-const byte GREEN_PIN = 10;  // pin ccontrolling the green leg of our RGB LED
-const byte BLUE_PIN = 9;    // pin ccontrolling the blue leg of our RGB LED
+const byte RED_PIN = 11;    // PWM pin controlling the red leg of our RGB LED
+const byte GREEN_PIN = 10;  // PWM pin ccontrolling the green leg of our RGB LED
+const byte BLUE_PIN = 9;    // PWM pin ccontrolling the blue leg of our RGB LED
 
 /*
  * Define a set of constants to represent 4 different brightness levels for our

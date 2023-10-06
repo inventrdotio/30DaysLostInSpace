@@ -34,13 +34,11 @@
 
 /*
  * Arduino concepts introduced/documented in this lesson.
- * - return:  Used by functions to return a single value and return immediately
- *            to the caller of the function.
- * - boolean type: bool is used for a value that can be "true" or "false"
- *                 NOTE: when testing values for true/false the value 0 is considered
- *                       "false" and any non-zero value is considered "true".
+ * - complex logic with multiple devices
  *
  * Parts and electronics concepts introduced in this lesson.
+ * - Changing wiring when particular pins (PWM) are required for added components.
+ * - Tone() and PWM analogWrite() cannot both operate at the same time.
  */
 
 // Explicitly include Arduino.h
@@ -82,27 +80,21 @@ void setup() {
   pinMode(GREEN_PIN, OUTPUT);
   pinMode(BLUE_PIN, OUTPUT);
 
-  // playInputTone();
-  // delay(5000);
+  // Since we start out "locked", we initially display a red color.
   displayColor(128, 0, 0);
-  // delay(1000);
-  // playErrorTone();
-  // delay(5000);
-  // displayColor(0, 128, 0);
-  // delay(1000);
-  // displayColor(0, 0, 128);
-  // delay(1000);
 
   Serial.begin(9600);  // Begin monitoring via the serial monitor
   Serial.println("Press * to set new password or # to access the system.");
 }
 
 void loop() {
-  char button_character = heroKeypad.getKey();
+  char button_character = heroKeypad.getKey();  // Wait for a button press and save character
 
-  if (button_character == '#') {  // button to access system
-    playInputTone();
-    bool access_allowed = validatePIN();
+  // The '#' button unlocks our console
+  if (button_character == '#') {          // Button to access system
+    giveInputFeedback();                  // Short beep with blue light
+    bool access_allowed = validatePIN();  // Have user enter PIN to allow access
+
     if (access_allowed) {
       Serial.println("Welcome, authorized user. You may now begin using the system.");
     } else {
@@ -111,28 +103,34 @@ void loop() {
     }
   }
 
-  if (button_character == '*') {  // button to change password
-    playInputTone();
-    bool access_allowed = validatePIN();
+  // The '*' allows the user to enter a new PIN after entering current PIN for security
+  if (button_character == '*') {          // Button to change password
+    giveInputFeedback();                  // Short beep with blue light
+    bool access_allowed = validatePIN();  // Have user enter PIN to allow access
 
     if (access_allowed) {
-      displayColor(128, 80, 0);
+      displayColor(128, 80, 0);  // Display yellow LED while entering a NEW PIN
       Serial.println("Welcome, authorized user. Please Enter a new password: ");
 
+      // Use a for() loop that runs once for each PIN character.  Each character read
+      // replaces a character in our original PIN.
       for (int i = 0; i < PIN_LENGTH; i++) {
-        button_character = heroKeypad.waitForKey();
+        password[i] = heroKeypad.waitForKey();  // replace PIN character with new character
+        // NOTE: After the LAST button press we will give Success feedback, but up to the
+        //       last character we simply give input feedback.  Since Array indices start
+        //       at 0, this if() statement will be true for all but the LAST character of
+        //       the new PIN.
         if (i < (PIN_LENGTH - 1)) {
-          playInputTone();
-          displayColor(128, 80, 0);
+          giveInputFeedback();
+          displayColor(128, 80, 0);  // override color
         }
 
-        password[i] = button_character;
         Serial.print("*");
       }
 
       Serial.println();  // add new line after last asterisk so next message is on next line
       Serial.println("PIN Successfully Changed!");
-      playSuccessTone();
+      giveSuccessFeedback();  // TADA sound and green light for successful PIN change
     } else {
       Serial.println("Access Denied. Cannot change PIN without entering current PIN first.");
       Serial.println("\nPress * to enter new PIN or # to access the system.");
@@ -142,27 +140,27 @@ void loop() {
 
 // Enter PIN and return false for bad PIN or true for good PIN
 bool validatePIN() {
-  // displayColor(0, 0, 128);    // Blue when we're expecting a PIN input
   Serial.println("Enter PIN to continue.");
 
   for (int i = 0; i < PIN_LENGTH; i++) {
     char button_character = heroKeypad.waitForKey();
 
     if (password[i] != button_character) {
-      playErrorTone();
-      Serial.println();  // start next message on new line
+      giveErrorFeedback();  // Error sound and red light
+      Serial.println();     // start next message on new line
       Serial.print("WRONG PIN DIGIT: ");
       Serial.println(button_character);
       return false;  // return false and exit function
     }
+    // Give normal input feedback for all but the LAST character
     if (i < (PIN_LENGTH - 1)) {
-      playInputTone();
+      giveInputFeedback();  // Short beep and blue LED
     }
     Serial.print("*");
   }
 
-  playSuccessTone();
-  Serial.println();  // add new line after last asterisk so next message is on next line
+  giveSuccessFeedback();  // PIN matched - TADA! sound with green LED
+  Serial.println();       // add new line after last asterisk so next message is on next line
   Serial.println("Device Successfully Unlocked!");
   return true;
 }
@@ -174,36 +172,41 @@ void displayColor(byte red_intensity, byte green_intensity, byte blue_intensity)
   analogWrite(BLUE_PIN, blue_intensity);    // Set blue LED intensity using PWM
 }
 
-void playInputTone() {
-  displayColor(0, 0, 0);
+/*
+ * NOTE:
+ * Both the PWM functions and tone() functions use some of the same HERO hardware
+ * for their functions.  If the RGB LED is on while a tone is played it will flicker
+ * or diplay other colors.  Because of this, we turn off the LED while a tone is
+ * being played and restore it immediately afterwards.
+ */
+
+// A recognized button was pressed.  Give short beep and blue LED
+void giveInputFeedback() {
+  displayColor(0, 0, 0);  // Turn off LED while playing tone
   tone(BUZZER_PIN, 880, 200);
-  delay(200);
-  displayColor(0, 0, 128);
-  // delay(50);
-  // noTone(BUZZER_PIN);
+  delay(200);               // Delay while tone is playing because tone() returns immediately
+  displayColor(0, 0, 128);  // Restore blue LED
 }
 
-void playSuccessTone() {
-  displayColor(0, 0, 0);
-  tone(BUZZER_PIN, 300, 200);  // Frequency = 1000Hz, Duration = 200ms
-  delay(200);                  // Short pause between tones
+// A matching PIN has been entered or a new PIN has been accepted.
+// Play TADA! sound and display green LED
+void giveSuccessFeedback() {
+  displayColor(0, 0, 0);  // Turn off LED while playing tone
+  tone(BUZZER_PIN, 300, 200);
+  delay(200);  // Delay while tone is playing because tone() returns immediately
 
-  tone(BUZZER_PIN, 500, 500);  // Frequency = 1500Hz, Duration = 200ms
-  delay(500);
-  displayColor(0, 128, 0);
+  tone(BUZZER_PIN, 500, 500);
+  delay(500);  // Delay while tone is playing because tone() returns immediately
+  displayColor(0, 128, 0); // Display green LED
 }
 
-void playErrorTone() {
-  displayColor(0, 0, 0);
-  tone(BUZZER_PIN, 300, 200);  // Frequency = 300Hz, Duration = 200ms
-  delay(200);                  // Short pause between tones
-
-  // tone(BUZZER_PIN, 250, 200);  // Frequency = 250Hz, Duration = 200ms
-  // delay(200);  // Short pause between tones
+// Bad PIN entered.  Play descending tone and display red LED
+void giveErrorFeedback() {
+  displayColor(0, 0, 0);  // Turn off LED while playing tone
+  tone(BUZZER_PIN, 300, 200);
+  delay(200);  // Delay while tone is playing because tone() returns immediately
 
   tone(BUZZER_PIN, 200, 500);  // Frequency = 200Hz, Duration = 200ms
-  delay(500);                  // Pause after playing to separate from next sound
-  displayColor(128, 0, 0);
-  // delay(50);
-  // noTone(BUZZER_PIN);
+  delay(500);  // Delay while tone is playing because tone() returns immediately
+  displayColor(128, 0, 0);  // Display red LED
 }

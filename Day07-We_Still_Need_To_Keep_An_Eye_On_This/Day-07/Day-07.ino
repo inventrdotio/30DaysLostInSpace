@@ -21,7 +21,7 @@
  * - No new parts as this sketch uses the same circuit as Day 6
  */
 
-// Explicitly include Arduiono.h
+// Explicitly include Arduino.h
 #include "Arduino.h"
 
 // Our photoresistor will give us a reading of the current light level on this analog pin

@@ -1,6 +1,6 @@
 /*
  * 30 Days - Lost in Space
- * Day 8 - A Better Way to Do Things
+ * Day 9 - A Better Way to Do Things
  *
  * Learn more at https://inventr.io/adventure
  *

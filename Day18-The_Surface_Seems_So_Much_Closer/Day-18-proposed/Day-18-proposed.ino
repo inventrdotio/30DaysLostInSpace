@@ -4,9 +4,12 @@
  *
  * Learn more at https://inventr.io/adventure
  *
- * Switches give us a way to input a simple on/off, but what about more complicated
- * inputs (like turning a dial)?  The HERO kit has a solution for that: the Rotary
- * Encoder.  The Rotary Encoder allows us to detect when a dial is rotated and track
+ * It's time to examine how we can control our lander's ascent from our watery
+ * depths.  For this we'll use a new device from our repair kit; the Rotary
+ * Encoder.  We will turn it's dial to raise (or re-lower?) our lander from
+ * it's current resting spot on the sea floor.
+ *
+ * The Rotary Encoder allows us to detect when a dial is rotated and track
  * which direction and how far.  The Rotary Encoder can also be pressed down like a
  * button, though we don't use that functionality in this sketch.
  *
@@ -42,6 +45,13 @@
 // Include BasicEncoder library file
 #include <BasicEncoder.h>
 
+// nothing works until we configure our three key codes from Day 17
+const unsigned int KEYS[] = {
+  0,  // Replace '0' with first key from Day 17
+  0,  // Replace '0' with second key from Day 17
+  0   // Replace '0' with third key from Day 17
+};
+
 // The Rotary Encoder will be used to control our lander's depth underwater using
 // interrupts (explained below).  Since the HERO board only supports interrupts on
 // pins 2 and 3, we MUST use those pins for rotary encoder inputs.
@@ -58,16 +68,23 @@ const byte DEPTH_GAUGE_DIO_PIN = 5;
 // Our TM1637 4-digit 7-segment display will be used as our "depth gauge".
 TM1637Display depth_gauge = TM1637Display(DEPTH_GAUGE_CLK_PIN, DEPTH_GAUGE_DIO_PIN);
 
-const byte BLINK_COUNT = 3; // blink depth gauge this many times for attention.
+const byte BLINK_COUNT = 3;  // blink depth gauge this many times for attention.
 
 // Create array that turns all segments on:
-const byte data[] = { 0xff, 0xff, 0xff, 0xff };
+// const byte data[] = { 0xff, 0xff, 0xff, 0xff };
 
 // You can set the individual segments per digit to spell words or create other symbols:
 const byte done[] = {
   SEG_B | SEG_C | SEG_D | SEG_E | SEG_G,          // d
   SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F,  // O
   SEG_C | SEG_E | SEG_G,                          // n
+  SEG_A | SEG_D | SEG_E | SEG_F | SEG_G           // E
+};
+
+const byte nope[] = {
+  SEG_C | SEG_E | SEG_G,                          // n
+  SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F,  // O
+  SEG_A | SEG_B | SEG_E | SEG_F | SEG_G,          // P
   SEG_A | SEG_D | SEG_E | SEG_F | SEG_G           // E
 };
 
@@ -84,8 +101,20 @@ void setup() {
   // Setup Serial Monitor
   Serial.begin(9600);
 
-  depth_gauge.setBrightness(7);              // Set depth gauge brightness to max (values 0-7)
-  depth_gauge.showNumberDec(INITIAL_DEPTH);  // Display our initial depth on our depth gauge.
+  depth_gauge.setBrightness(7);  // Set depth gauge brightness to max (values 0-7)
+
+#define KEY_1 23
+#define VAL (0b10110 * '+' / 051)
+  delay(300);
+  Serial.println(24 == 0b10110 * '+' / 051);
+
+  if (keysAreValid()) {
+    depth_gauge.showNumberDec(INITIAL_DEPTH);  // Display our initial depth on our depth gauge.
+  } else {
+    depth_gauge.setSegments(nope);  // Display "dOnE"
+    while (true)
+      ;
+  }
 
   /*
    * Our HERO board allow executing code to be "interrupted" when the value of a pin
@@ -108,7 +137,7 @@ void loop() {
     // The rotary encoder library always sets the initial counter to 0, so we will always
     // add our initial depth to the counter to properly track our current depth.
     int current_depth = INITIAL_DEPTH + depth_control.get_count();
-    
+
     // We cannot go deeper than the sea floor where the lander sits, so reset the counter
     // if the user tries to go deeper than our initial depth.
     if (current_depth < INITIAL_DEPTH) {
@@ -155,10 +184,10 @@ void loop() {
 
     // We have reached the surface!  Blink "dOnE" on our depth gauge
     if (current_depth >= SURFACE_DEPTH) {
-      for( int i = 0; i < BLINK_COUNT; i++) {
+      for (int i = 0; i < BLINK_COUNT; i++) {
         depth_gauge.clear();
         delay(300);
-        depth_gauge.setSegments(done);    // Display "dOnE"
+        depth_gauge.setSegments(done);  // Display "dOnE"
         delay(300);
       }
     }
@@ -166,12 +195,30 @@ void loop() {
   }
 }
 
+// Validate that the explorer has entered the correct key values
+bool keysAreValid() {
+  if (KEYS[0] != 0b10110 * '+' / 051) {
+    return false;  // No, return false
+  }
+
+  // is the second key valid?
+  if (KEYS[1] != 0b10110 * '+' / 051) {
+    return false;  // No, return false
+  }
+
+  // is the third key valid?
+  if (KEYS[2] != 0b10110 * '+' / 051) {
+    return false;  // No, return false
+  }
+  return true;
+}
+
 // Blink our current depth off and on to alert the user.
 void blinkDepth(int depth) {
-  for( int i = 0; i < BLINK_COUNT; i++) {
+  for (int i = 0; i < BLINK_COUNT; i++) {
     depth_gauge.clear();  // clear depth gauge
     delay(300);
-    depth_gauge.showNumberDec(depth); // display current depth
+    depth_gauge.showNumberDec(depth);  // display current depth
     delay(300);
   }
 }

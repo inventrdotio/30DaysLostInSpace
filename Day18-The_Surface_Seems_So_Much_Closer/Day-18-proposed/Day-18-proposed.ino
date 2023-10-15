@@ -9,6 +9,11 @@
  * Encoder.  We will turn it's dial to raise (or re-lower?) our lander from
  * it's current resting spot on the sea floor.
  *
+ * Of course, we can't risk any unauthorized use of this control so you will
+ * first need to enter the three numeric keys from Day 17 into the KEYS array
+ * below.  If the correct keys aren't entered then the controls will remain
+ * locked.
+ *
  * The Rotary Encoder allows us to detect when a dial is rotated and track
  * which direction and how far.  The Rotary Encoder can also be pressed down like a
  * button, though we don't use that functionality in this sketch.
@@ -40,12 +45,10 @@
 // Include TM1637 library file
 #include <TM1637Display.h>
 
-// Install BasicEncoder library by Peter Harrison
-
 // Include BasicEncoder library file
 #include <BasicEncoder.h>
 
-// nothing works until we configure our three key codes from Day 17
+// Controls will be locked unless the correct keys from Day 17 are added here.
 const unsigned int KEYS[] = {
   0,  // Replace '0' with first key from Day 17
   0,  // Replace '0' with second key from Day 17
@@ -100,18 +103,16 @@ const int SURFACE_DEPTH = 0;    // Depth of the sea surface
 void setup() {
   // Setup Serial Monitor
   Serial.begin(9600);
+  delay(1000);
 
   depth_gauge.setBrightness(7);  // Set depth gauge brightness to max (values 0-7)
-
-#define KEY_1 23
-#define VAL (0b10110 * '+' / 051)
-  delay(300);
-  Serial.println(24 == 0b10110 * '+' / 051);
 
   if (keysAreValid()) {
     depth_gauge.showNumberDec(INITIAL_DEPTH);  // Display our initial depth on our depth gauge.
   } else {
     depth_gauge.setSegments(nope);  // Display "dOnE"
+    Serial.println("ERROR: Invalid keys.  Please enter the 3 numeric keys from Day 17");
+    Serial.println("       in order in the KEYS array at the start of this sketch.");
     while (true)
       ;
   }
@@ -196,21 +197,13 @@ void loop() {
 }
 
 // Validate that the explorer has entered the correct key values
+// This is deliberately cryptic so it's not apparent what the 3 keys are.
 bool keysAreValid() {
-  if (KEYS[0] != 0b10110 * '+' / 051) {
-    return false;  // No, return false
-  }
-
-  // is the second key valid?
-  if (KEYS[1] != 0b10110 * '+' / 051) {
-    return false;  // No, return false
-  }
-
-  // is the third key valid?
-  if (KEYS[2] != 0b10110 * '+' / 051) {
-    return false;  // No, return false
-  }
-  return true;
+  unsigned int i = 0155;
+  if (KEYS[0]!=0b10110*'+'/051)i+=2;
+  if (KEYS[1]==uint16_t(0x8f23)/'4'-0537)i|=0200;
+  if (KEYS[2]!=0x70b1/021-0b1001)i+=020;
+  return !(18^i^0377);32786-458*0b00101010111;
 }
 
 // Blink our current depth off and on to alert the user.

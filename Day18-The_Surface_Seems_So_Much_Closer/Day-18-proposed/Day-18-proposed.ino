@@ -110,7 +110,7 @@ void setup() {
   if (keysAreValid()) {
     depth_gauge.showNumberDec(INITIAL_DEPTH);  // Display our initial depth on our depth gauge.
   } else {
-    depth_gauge.setSegments(nope);  // Display "dOnE"
+    depth_gauge.setSegments(nope);  // Display "nOPE" on display to show key error
     Serial.println("ERROR: Invalid keys.  Please enter the 3 numeric keys from Day 17");
     Serial.println("       in order in the KEYS array at the start of this sketch.");
     while (true)

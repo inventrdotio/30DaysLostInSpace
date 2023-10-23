@@ -113,9 +113,27 @@ void loop() {
   hero_display.clear();
   delay(1000);
 
-  // Microwave after a power outage
-  // Blinking 12:00.  The .showNumberDecEx has an additional parameter to turn
-  // on the ':' after the 2nd digit.  This works well for time displays.
+  /*
+   *
+   * Microwave after a power outage
+   * Blinking 12:00.  The .showNumberDecEx() function has an additional parameter to turn
+   * on the ':' after the 2nd digit.  This works well for time displays.
+   *
+   * The second parameter can also be used to control dots between digits if the
+   * display has them.  In our case, the HERO display only has the colon.
+   *
+   * Dot/Colon enable. The argument is a bitmask, with each bit corresponding to a dot
+   *        between the digits (or colon mark, as implemented by each module). i.e.
+   *        For displays with dots between each digit:
+   *        * 0.000 (0b10000000)
+   *        * 00.00 (0b01000000)
+   *        * 000.0 (0b00100000)
+   *        * 0.0.0.0 (0b11100000)
+   *        For displays with just a colon:     <== This is true for the HERO display
+   *        * 00:00 (0b01000000)
+   *        For displays with dots and colons colon:
+   *        * 0.0:0.0 (0b11100000)
+   */
   for (int i = 0; i < 4; i++) {
     hero_display.showNumberDecEx(1200, 0b01000000);
     delay(500);

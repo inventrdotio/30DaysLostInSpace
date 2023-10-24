@@ -52,7 +52,7 @@ void setup(void) {
   // lander_display.setDisplayRotation(U8G2_R2);
 }
 
-const byte VIEWS = 2;
+const byte VIEWS = 4;
 
 void loop(void) {
   for (unsigned int draw_state = 0; draw_state < (VIEWS * 8); draw_state++) {
@@ -73,6 +73,8 @@ void loop(void) {
     switch (draw_state >> 3) {
       case 0: display_test_ready(y_offset, draw_state & 7); break;
       case 1: display_test_box_frame(y_offset, draw_state & 7); break;
+      case 2: display_test_circles(y_offset, draw_state & 7); break;
+      case 3: display_test_r_frame(y_offset, draw_state & 7); break;
     }
     lander_display.sendBuffer();
     delay(50);
@@ -100,33 +102,35 @@ void display_test_ready(byte y_offset, byte frame) {
   // Now display ready message every other frame
   if ((frame & 1) == 0) {
     // Serial.println ("display");
-  byte x_offset = LANDER_WIDTH;  // display to right of lander image
+    byte x_offset = LANDER_WIDTH;  // display to right of lander image
 
-  byte text_height = lander_display.getMaxCharHeight();
+    byte text_height = lander_display.getMaxCharHeight();
 
-  // Display line 1 on display
-  byte line_1_y_offset = y_center - text_height - (text_height / 2);
-  const char READY_LINE_1[] = "Begin";
-  byte line_1_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
-                         - (lander_display.getStrWidth(READY_LINE_1) / 2);
-  lander_display.drawStr(line_1_x_center, line_1_y_offset, READY_LINE_1);
+    // Display line 1 on display
+    byte line_1_y_offset = y_center - text_height - (text_height / 2);
+    const char READY_LINE_1[] = "Begin";
+    byte line_1_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
+                           - (lander_display.getStrWidth(READY_LINE_1) / 2);
+    lander_display.drawStr(line_1_x_center, line_1_y_offset, READY_LINE_1);
 
-  // Display line 2 on display
-  byte line_2_y_offset = line_1_y_offset + text_height;
-  const char READY_LINE_2[] = "Hardware";
-  byte line_2_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
-                         - (lander_display.getStrWidth(READY_LINE_2) / 2);
-  lander_display.drawStr(line_2_x_center, line_2_y_offset, READY_LINE_2);
+    // Display line 2 on display
+    byte line_2_y_offset = line_1_y_offset + text_height;
+    const char READY_LINE_2[] = "Hardware";
+    byte line_2_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
+                           - (lander_display.getStrWidth(READY_LINE_2) / 2);
+    lander_display.drawStr(line_2_x_center, line_2_y_offset, READY_LINE_2);
 
-  // Display line 3 on display
-  byte line_3_y_offset = line_2_y_offset + text_height;
-  const char READY_LINE_3[] = "Test";
-  byte line_3_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
-                  - (lander_display.getStrWidth(READY_LINE_3) / 2);
-  lander_display.drawStr(line_3_x_center, line_3_y_offset, READY_LINE_3);
+    // Display line 3 on display
+    byte line_3_y_offset = line_2_y_offset + text_height;
+    const char READY_LINE_3[] = "Test";
+    byte line_3_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
+                           - (lander_display.getStrWidth(READY_LINE_3) / 2);
+    lander_display.drawStr(line_3_x_center, line_3_y_offset, READY_LINE_3);
   }
 }
 
+// Display an image of our lander drawn with frames and triangles
+// at location x_location, y_location for upper left corner.
 void display_lander(byte x_location, byte y_location) {
   lander_display.drawFrame(x_location + 7, y_location, 6, 5);        // ship top
   lander_display.drawFrame(x_location + 5, y_location + 4, 10, 20);  // ship center
@@ -140,6 +144,7 @@ void display_lander(byte x_location, byte y_location) {
                               x_location + 20, y_location + 25);  // right nozzle
 }
 
+// Display filled and hollow boxes.
 void display_test_box_frame(byte y_offset, byte frame) {
   lander_display.drawStr(0, y_offset, "drawBox");
   lander_display.drawBox(5, y_offset + 10, 20, 10);
@@ -149,20 +154,22 @@ void display_test_box_frame(byte y_offset, byte frame) {
   lander_display.drawFrame(10 + frame, y_offset + 15 + 30, 30, 7);
 }
 
-// void u8g_disc_circle(uint8_t a) {
-//   lander_display.drawStr( 0, 0, "drawDisc");
-//   lander_display.drawDisc(10,18,9);
-//   lander_display.drawDisc(24+a,16,7);
-//   lander_display.drawStr( 0, 30, "drawCircle");
-//   lander_display.drawCircle(10,18+30,9);
-//   lander_display.drawCircle(24+a,16+30,7);
-// }
+// Display filled and hollow circles.
+void display_test_circles(byte y_offset, byte frame) {
+  lander_display.drawStr(0, y_offset, "drawDisc");
+  lander_display.drawDisc(10, y_offset + 18, 8);
+  lander_display.drawDisc(24 + frame, y_offset + 16, 7);
+  lander_display.drawStr(0, y_offset + 27, "drawCircle");
+  lander_display.drawCircle(10, y_offset + 18 + 27, 8);
+  lander_display.drawCircle(24 + frame, y_offset + 18 + 25, 6);
+}
 
-// void u8g_r_frame(uint8_t a) {
-//   lander_display.drawStr( 0, 0, "drawRFrame/Box");
-//   lander_display.drawRFrame(5, 10,40,30, a+1);
-//   lander_display.drawRBox(50, 10,25,40, a+1);
-// }
+// Display filled and hollow boxes with rounded corners
+void display_test_r_frame(byte y_offset, byte frame) {
+  lander_display.drawStr(0, y_offset, "drawRFrame/Box");
+  lander_display.drawRFrame(5, y_offset + 10, 40, 30, frame + 1);
+  lander_display.drawRBox(50, y_offset + 10, 25, 40, frame + 1);
+}
 
 // void u8g_string(uint8_t a) {
 //   lander_display.drawStr(30+a,31, " 0");

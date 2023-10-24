@@ -39,9 +39,6 @@
 U8G2_SH1106_128X64_NONAME_F_HW_I2C lander_display(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 
 void setup(void) {
-  Serial.begin(9600);
-  delay(1000);
-
   lander_display.begin();  // Initialize display library
 
   lander_display.setFont(u8g_font_6x10);
@@ -52,7 +49,7 @@ void setup(void) {
   // lander_display.setDisplayRotation(U8G2_R2);
 }
 
-const byte VIEWS = 4;
+const byte VIEWS = 7;
 
 void loop(void) {
   for (unsigned int draw_state = 0; draw_state < (VIEWS * 8); draw_state++) {
@@ -75,6 +72,9 @@ void loop(void) {
       case 1: display_test_box_frame(y_offset, draw_state & 7); break;
       case 2: display_test_circles(y_offset, draw_state & 7); break;
       case 3: display_test_r_frame(y_offset, draw_state & 7); break;
+      case 4: display_test_string(y_offset, draw_state & 7); break;
+      case 5: display_test_line(y_offset, draw_state & 7); break;
+      case 6: display_test_triangle(y_offset, draw_state & 7); break;
     }
     lander_display.sendBuffer();
     delay(50);
@@ -171,29 +171,44 @@ void display_test_r_frame(byte y_offset, byte frame) {
   lander_display.drawRBox(50, y_offset + 10, 25, 40, frame + 1);
 }
 
-// void u8g_string(uint8_t a) {
-//   lander_display.drawStr(30+a,31, " 0");
-//   lander_display.drawStr90(30,31+a, " 90");
-//   lander_display.drawStr180(30-a,31, " 180");
-//   lander_display.drawStr270(30,31-a, " 270");
-// }
+void display_test_string(byte y_offset, byte frame) {
+  int test_offset = y_offset + 31;
+  lander_display.drawStr(30 + frame, test_offset, " 0");
+  lander_display.setFontDirection(1);
+  lander_display.drawStr(30, test_offset + frame, " 90");
+  lander_display.setFontDirection(2);
+  lander_display.drawStr(30 - frame, test_offset, " 180");
+  lander_display.setFontDirection(3);
+  lander_display.drawStr(30, test_offset - frame, " 270");
+  lander_display.setFontDirection(0);
+}
 
-// void u8g_line(uint8_t a) {
-//   lander_display.drawStr( 0, 0, "drawLine");
-//   lander_display.drawLine(7+a, 10, 40, 55);
-//   lander_display.drawLine(7+a*2, 10, 60, 55);
-//   lander_display.drawLine(7+a*3, 10, 80, 55);
-//   lander_display.drawLine(7+a*4, 10, 100, 55);
-// }
+void display_test_line(byte y_offset, byte frame) {
+  lander_display.drawStr(0, y_offset, "drawLine");
+  int test_offset = y_offset + lander_display.getMaxCharHeight();
+  lander_display.drawLine(7 + frame, test_offset, 40, 55);
+  lander_display.drawLine(7 + frame * 2, test_offset, 60, 55);
+  lander_display.drawLine(7 + frame * 3, test_offset, 80, 55);
+  lander_display.drawLine(7 + frame * 4, test_offset, 100, 55);
+}
 
-// void u8g_triangle(uint8_t a) {
-//   uint16_t offset = a;
-//   lander_display.drawStr( 0, 0, "drawTriangle");
-//   lander_display.drawTriangle(14,7, 45,30, 10,40);
-//   lander_display.drawTriangle(14+offset,7-offset, 45+offset,30-offset, 57+offset,10-offset);
-//   lander_display.drawTriangle(57+offset*2,10, 45+offset*2,30, 86+offset*2,53);
-//   lander_display.drawTriangle(10+offset,40+offset, 45+offset,30+offset, 86+offset,53+offset);
-// }
+void display_test_triangle(byte y_offset, byte frame) {
+  lander_display.drawStr(0, y_offset, "drawTriangle");
+  int test_offset = y_offset + lander_display.getMaxCharHeight();
+
+  lander_display.drawTriangle(14, test_offset + 7,
+                              45, test_offset + 20,
+                              10, test_offset + 30);
+  lander_display.drawTriangle(14 + frame, test_offset + 7 - frame,
+                              45 + frame, test_offset + 20 - frame,
+                              57 + frame, test_offset + 00 - frame);
+  lander_display.drawTriangle(57 + frame * 2, test_offset + 0,
+                              45 + frame * 2, test_offset + 20,
+                              96 + frame * 2, test_offset + 43);
+  lander_display.drawTriangle(10 + frame, test_offset + 30 + frame,
+                              45 + frame, test_offset + 20 + frame,
+                              96 + frame, test_offset + 43 + frame);
+}
 
 // void u8g_ascii_1() {
 //   char s[2] = " ";

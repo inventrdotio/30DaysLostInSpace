@@ -31,6 +31,7 @@
  * - I2C communications.
  * - Computer character fonts
  * - U8g2 graphics library for monochrome displays
+ * - Logical Not operator ('!')
  *
  * Parts and electronics concepts introduced in this lesson.
  * - SH1106 monochrome 128x64 pixel OLED display.
@@ -82,7 +83,7 @@ void loop(void) {
   // Save the number of vertical pixels required for the tallest character
   // in the current font.  This is used later to properly position text on
   // our display.
-  u8g2_uint_t font_height = lander_display.getMaxCharHeight();
+  byte font_height = lander_display.getMaxCharHeight();
 
   lander_display.clearBuffer();  // clear the internal memory
 
@@ -99,13 +100,10 @@ void loop(void) {
   lander_display.setFontPosTop();
 
   // Title line for our display
-  const char DISPLAY_TITLE[] = "Exploration Lander";
-  lander_display.setCursor(center_string(DISPLAY_TITLE), 0);  // Center title at top of display
-  lander_display.print(DISPLAY_TITLE);
+  drawCenteredString(0, "Exploration Lander");
 
-  const char HELLO_WORLD[] = "Hello World!";
-  lander_display.setCursor(center_string(HELLO_WORLD), font_height);
-  lander_display.print(HELLO_WORLD);
+  // Display our "Hello World!" message on line 2 (moving down "font_height" bits)
+  drawCenteredString(font_height, "Hello World!");
 
   /*
    * We will blink a message centered in the remainder of the display.  However, with
@@ -119,27 +117,32 @@ void loop(void) {
    * toggle the variable to the opposite value.
    */
   static bool blink_on = true;
-  const char MESSAGE[] = "Stand by";
   if (blink_on) {
     /*
     * Now let's center our starting message in the remaining space.  To do this we'll take the
     * height of our display, subtract the height of our title lines and divide by two.  We'll then
     * instruct the library to center the text vertically from our starting Y position.
     */
-    byte center_y = (font_height * 2) + ((lander_display.getDisplayHeight() - (font_height * 2)) / 2);
+    byte centered_y = (font_height * 2) + ((lander_display.getDisplayHeight() - (font_height * 2)) / 2);
 
-    lander_display.setFontPosCenter();
-    lander_display.setCursor(center_string(MESSAGE), center_y);
-    lander_display.print(MESSAGE);
+    // This statement instructs the graphics library that the Y coordinate used to position
+    // the text will be halfway between the top and bottom of the text.
+    lander_display.setFontPosCenter();  // Draw text with centered Y coordinate
+    drawCenteredString(centered_y, "Stand by");
   }
+  // A boolean value can be changed between it's two states by setting it to the opposite
+  // state using the "logical not".  Not true = false.  Not false = true.
+  // This would be read as "blink on equals not blink on".
   blink_on = !blink_on;   // toggle value of blink_on between true and false
 
   // Nothing is displayed on our display until the buffer is sent to the display, below.
   lander_display.sendBuffer();  // transfer internal memory to the display
-  delay(500);
+  delay(500);   // Delay for blink effect
 }
 
-// Return starting X position that will center the given string
-byte center_string(char *string) {
-  return (lander_display.getDisplayWidth() - lander_display.getStrWidth(string)) / 2;
+// Use the .drawStr() method to draw the current string centered in
+// the current display.
+byte drawCenteredString(byte y, char *string) {
+  byte centered_x = (lander_display.getDisplayWidth() - lander_display.getStrWidth(string)) / 2;
+  lander_display.drawStr(centered_x, y, string);
 }

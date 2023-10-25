@@ -2,6 +2,13 @@
  * 30 Days - Lost in Space
  * Day 22 - Hello New World!
  *
+ * Even our new OLED display is a bit small if we have large amounts of
+ * information to display.  But this new display isn't limited to JUST
+ * text!  It is a 128x64 pixel display and we can turn any of them on/off
+ * to display whatever we like, including graphics.
+ *
+ * Today we'll run a "readiness check" on our new display to test out its
+ * full capabilities.
  *
  * Learn more at https://inventr.io/adventure
  *
@@ -12,13 +19,12 @@
 
 /*
  * Arduino concepts introduced/documented in this lesson.
- * - I2C communications.
- * - Computer character fonts
- * - U8g2 graphics library for monochrome displays
+ * - 
+ * - 
+ * - 
  *
  * Parts and electronics concepts introduced in this lesson.
- * - SH1106 monochrome 128x64 pixel OLED display.
- * - HERO I2C pins (A5 and A4)
+ * - 
  */
 
 // Explicitly include Arduino.h
@@ -45,10 +51,20 @@ void setup(void) {
   // lander_display.setDisplayRotation(U8G2_R2);
 }
 
-const byte VIEWS = 13;
-
+/*
+ * For our main loop() we will cycle through each test page, displaying
+ * 8 frames for each test (which allows animation on each page).
+ *
+ * Rather than use two variables, one to track the page and one to track
+ * the frame, we will demonstrate the use of the "bitshift" operators (">>"
+ * and "<<") in conjunction with the bitwise and" to use a single variable.
+ *
+ * While this method is less clear, it is sometimes used when memory is very
+ * tight since it uses less data storage.
+ */
 void loop(void) {
-  for (unsigned int draw_state = 0; draw_state < (VIEWS * 8); draw_state++) {
+  const byte TEST_PAGE_COUNT = 13;
+  for (unsigned int display_frame = 0; display_frame < (TEST_PAGE_COUNT * 8); display_frame++) {
     lander_display.clearBuffer();  // clear the internal memory
 
     // setCursor() will set the x/y location of the upper left bit of each string
@@ -57,87 +73,47 @@ void loop(void) {
     lander_display.setFontPosTop();
 
     // Title line for our display displayed on each screen
-    // const char DISPLAY_TITLE[] = "Exploration Lander";
-    drawCenteredString(0, "Exploration Lander");  // Center title at top of display
-    // lander_display.print(DISPLAY_TITLE);
+    drawCenteredString(0, 0, "Exploration Lander");  // Center title at top of display
 
     // To leave the title above each display we offset the y starting point
     // by the maximum character height of our selected font.
-    byte y_offset = lander_display.getMaxCharHeight();
+    byte y_offset = lander_display.getMaxCharHeight();  // maximum height of current font
 
-    // draw_state = (draw_state & 7) | (12 << 3);
-    switch (draw_state >> 3) {
-      case 0: display_test_ready(y_offset, draw_state & 7); break;
-      case 1: display_test_box_frame(y_offset, draw_state & 7); break;
-      case 2: display_test_circles(y_offset, draw_state & 7); break;
-      case 3: display_test_r_frame(y_offset, draw_state & 7); break;
-      case 4: display_test_string(y_offset, draw_state & 7); break;
-      case 5: display_test_line(y_offset, draw_state & 7); break;
-      case 6: display_test_triangle(y_offset, draw_state & 7); break;
+    // display_frame = (display_frame & 7) | (0 << 3);
+    switch (display_frame >> 3) {
+      case 0: display_test_ready(y_offset, display_frame & 7); break;
+      case 1: display_test_box_frame(y_offset, display_frame & 7); break;
+      case 2: display_test_circles(y_offset, display_frame & 7); break;
+      case 3: display_test_r_frame(y_offset, display_frame & 7); break;
+      case 4: display_test_string(y_offset, display_frame & 7); break;
+      case 5: display_test_line(y_offset, display_frame & 7); break;
+      case 6: display_test_triangle(y_offset, display_frame & 7); break;
       case 7: display_test_ascii_1(y_offset); break;
       case 8: display_test_ascii_2(y_offset); break;
-      case 9: display_test_extra_page(y_offset, draw_state & 7); break;
-      case 10: display_test_bitmap_modes(y_offset, draw_state & 7, false); break;
-      case 11: display_test_bitmap_modes(y_offset, draw_state & 7, true); break;
-      case 12: display_test_bitmap_overlay(y_offset, draw_state & 7); break;
+      case 9: display_test_extra_page(y_offset, display_frame & 7); break;
+      case 10: display_test_bitmap_modes(y_offset, display_frame & 7, false); break;
+      case 11: display_test_bitmap_modes(y_offset, display_frame & 7, true); break;
+      case 12: display_test_bitmap_overlay(y_offset, display_frame & 7); break;
     }
     lander_display.sendBuffer();
     delay(50);
   }
 }
 
-// Use the .drawStr() method to draw the current string centered on
-// the current display.
-byte drawCenteredString(byte y, char *string) {
-  byte centered_x = (lander_display.getDisplayWidth() - lander_display.getStrWidth(string)) / 2;
+// Use the .drawStr() method to draw a string in the display centered
+// horizontally between the given X coordinate and the maximum X.
+// Y coordinate is unchanged and text is displayed relative to the
+// current font positioning mode (Top, Center, Bottom).
+byte drawCenteredString(byte x, byte y, char *string) {
+  byte centered_x = x + ((lander_display.getDisplayWidth() - x) - lander_display.getStrWidth(string)) / 2;
   lander_display.drawStr(centered_x, y, string);
 }
 
-const byte LANDER_HEIGHT = 25;
-const byte LANDER_WIDTH = 20;
+const byte LANDER_HEIGHT = 25;    // height of our lander image, in bits
+const byte LANDER_WIDTH = 20;     // width of our lander image, in bits
 
-void display_test_ready(byte y_offset, byte frame) {
-  // Y value halfway between top and bottom of drawable area
-  byte y_center = y_offset + ((lander_display.getDisplayHeight() - y_offset) / 2);
-
-  // Center lander Y location in center of space below title
-  byte lander_y_offset = y_center - (LANDER_HEIGHT / 2);
-  display_lander(0, lander_y_offset);
-
-  // Serial.print("display_test_ready Frame: ");
-  // Serial.println(frame);
-  // Now display ready message every other frame
-  if ((frame & 1) == 0) {
-    // Serial.println ("display");
-    byte x_offset = LANDER_WIDTH;  // display to right of lander image
-
-    byte text_height = lander_display.getMaxCharHeight();
-
-    // Display line 1 on display
-    byte line_1_y_offset = y_center - text_height - (text_height / 2);
-    const char READY_LINE_1[] = "Begin";
-    byte line_1_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
-                           - (lander_display.getStrWidth(READY_LINE_1) / 2);
-    lander_display.drawStr(line_1_x_center, line_1_y_offset, READY_LINE_1);
-
-    // Display line 2 on display
-    byte line_2_y_offset = line_1_y_offset + text_height;
-    const char READY_LINE_2[] = "Hardware";
-    byte line_2_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
-                           - (lander_display.getStrWidth(READY_LINE_2) / 2);
-    lander_display.drawStr(line_2_x_center, line_2_y_offset, READY_LINE_2);
-
-    // Display line 3 on display
-    byte line_3_y_offset = line_2_y_offset + text_height;
-    const char READY_LINE_3[] = "Test";
-    byte line_3_x_center = x_offset + ((lander_display.getDisplayWidth() - x_offset) / 2)
-                           - (lander_display.getStrWidth(READY_LINE_3) / 2);
-    lander_display.drawStr(line_3_x_center, line_3_y_offset, READY_LINE_3);
-  }
-}
-
-// Display an image of our lander drawn with frames and triangles
-// at location x_location, y_location for upper left corner.
+// Draw an image of our lander drawn with frames and triangles
+// at location x_location, y_location (relative to the upper left corner).
 void display_lander(byte x_location, byte y_location) {
   lander_display.drawFrame(x_location + 7, y_location, 6, 5);        // ship top
   lander_display.drawFrame(x_location + 5, y_location + 4, 10, 20);  // ship center
@@ -151,34 +127,69 @@ void display_lander(byte x_location, byte y_location) {
                               x_location + 20, y_location + 25);  // right nozzle
 }
 
+// Page 0: Display lander drawing and blinking begin message
+void display_test_ready(byte y_offset, byte frame) {
+  // Y value halfway between top and bottom of drawable area
+  byte y_center = y_offset + ((lander_display.getDisplayHeight() - y_offset) / 2);
+
+  // Since our lander drawing's location is set using the upper-left
+  // coordinates we will subtract half our drawing's height to center
+  // it vertically.
+  //
+  // We will also shift it right by adding a "padding" amount to the
+  // lander's X coordinate.
+  const byte LANDER_PADDING = LANDER_WIDTH;   // shift lander right by its width
+  byte lander_y_offset = y_center - (LANDER_HEIGHT / 2);
+  display_lander(LANDER_PADDING, lander_y_offset);
+
+  // Blink the "ready" message by only displaying it every other frame
+  // by extracting the rightmost bit of our frame number and only displaying
+  // the message if the bit is 0 (frames 0, 2, 4, 6).
+  if ((frame & 0b00000001) == 0) {
+    // Determine remaining space to the right of our lander for our message.
+    // The lander image extends from its starting X position plus its width.
+    byte x_offset = LANDER_PADDING + LANDER_WIDTH;
+
+    // get the height of each text line since it's used multiple times below
+    byte text_height = lander_display.getMaxCharHeight();
+
+    lander_display.setFontPosCenter();  // Y coordinate relative to center of font height
+    // Display line 1 on display, one line above center
+    drawCenteredString(x_offset, y_center - text_height, "Begin");
+
+    // Display line 2, vertically centered in space below title
+    drawCenteredString(x_offset, y_center, "Hardware");
+
+    // Display line 3 on display, one line below center
+    drawCenteredString(x_offset, y_center + text_height, "Test");
+  }
+}
+
 // Display filled and hollow boxes.
 void display_test_box_frame(byte y_offset, byte frame) {
-  drawCenteredString(y_offset, "drawBox");
-  // lander_display.drawStr(0, y_offset, "drawBox");
+  drawCenteredString(0, y_offset, "drawBox");
   lander_display.drawBox(5, y_offset + 10, 20, 10);
   lander_display.drawBox(10 + frame, y_offset + 15, 30, 7);
-  drawCenteredString(y_offset + 30, "drawFrame");
-  // lander_display.drawStr(0, y_offset + 30, "drawFrame");
+
+  drawCenteredString(0, y_offset + 30, "drawFrame");
   lander_display.drawFrame(5, y_offset + 10 + 30, 20, 10);
   lander_display.drawFrame(10 + frame, y_offset + 15 + 30, 30, 7);
 }
 
 // Display filled and hollow circles.
 void display_test_circles(byte y_offset, byte frame) {
-  drawCenteredString(y_offset, "drawDisc");
-  // lander_display.drawStr(0, y_offset, "drawDisc");
+  drawCenteredString(0, y_offset, "drawDisc");
   lander_display.drawDisc(10, y_offset + 18, 8);
   lander_display.drawDisc(24 + frame, y_offset + 16, 7);
-  drawCenteredString(y_offset + 27, "drawCircle");
-  // lander_display.drawStr(0, y_offset + 27, "drawCircle");
+
+  drawCenteredString(0, y_offset + 27, "drawCircle");
   lander_display.drawCircle(10, y_offset + 18 + 27, 8);
   lander_display.drawCircle(24 + frame, y_offset + 18 + 25, 6);
 }
 
 // Display filled and hollow boxes with rounded corners
 void display_test_r_frame(byte y_offset, byte frame) {
-  drawCenteredString(y_offset, "drawRFrame/Box");
-  // lander_display.drawStr(0, y_offset, "drawRFrame/Box");
+  drawCenteredString(0, y_offset, "drawRFrame/Box");
   lander_display.drawRFrame(5, y_offset + 10, 40, 30, frame + 1);
   lander_display.drawRBox(50, y_offset + 10, 25, 40, frame + 1);
 }
@@ -196,8 +207,7 @@ void display_test_string(byte y_offset, byte frame) {
 }
 
 void display_test_line(byte y_offset, byte frame) {
-  drawCenteredString(y_offset, "drawLine");
-  // lander_display.drawStr(0, y_offset, "drawLine");
+  drawCenteredString(0, y_offset, "drawLine");
   int test_offset = y_offset + lander_display.getMaxCharHeight();
   lander_display.drawLine(7 + frame, test_offset, 40, 55);
   lander_display.drawLine(7 + frame * 2, test_offset, 60, 55);
@@ -206,10 +216,9 @@ void display_test_line(byte y_offset, byte frame) {
 }
 
 void display_test_triangle(byte y_offset, byte frame) {
-  drawCenteredString(y_offset, "drawTriangle");
-  // lander_display.drawStr(0, y_offset, "drawTriangle");
-  int test_offset = y_offset + lander_display.getMaxCharHeight();
+  drawCenteredString(0, y_offset, "drawTriangle");
 
+  int test_offset = y_offset + lander_display.getMaxCharHeight();
   lander_display.drawTriangle(14, test_offset + 7,
                               45, test_offset + 20,
                               10, test_offset + 30);
@@ -227,8 +236,7 @@ void display_test_triangle(byte y_offset, byte frame) {
 void display_test_ascii_1(byte y_offset) {
   char s[2] = " ";
   byte x, y;
-  drawCenteredString(y_offset, "ASCII page 1");
-  // lander_display.drawStr(0, y_offset, "ASCII page 1");
+  drawCenteredString(0, y_offset, "ASCII page 1");
   int test_offset = y_offset + lander_display.getMaxCharHeight();
   for (y = 0; y < 6; y++) {
     for (x = 0; x < 16; x++) {
@@ -241,8 +249,7 @@ void display_test_ascii_1(byte y_offset) {
 void display_test_ascii_2(byte y_offset) {
   char s[2] = " ";
   byte x, y;
-  drawCenteredString(y_offset, "ASCII page 2");
-  // lander_display.drawStr(0, y_offset, "ASCII page 2");
+  drawCenteredString(0, y_offset, "ASCII page 2");
   int test_offset = y_offset + lander_display.getMaxCharHeight();
   for (y = 0; y < 6; y++) {
     for (x = 0; x < 16; x++) {
@@ -253,8 +260,7 @@ void display_test_ascii_2(byte y_offset) {
 }
 
 void display_test_extra_page(byte y_offset, byte frame) {
-  drawCenteredString(y_offset, "Unicode");
-  // lander_display.drawStr(0, y_offset, "Unicode");
+  drawCenteredString(0, y_offset, "Unicode");
   int test_offset = y_offset + lander_display.getMaxCharHeight();
   lander_display.setFont(u8g2_font_unifont_t_symbols);
   lander_display.setFontPosTop();
@@ -305,21 +311,14 @@ static const unsigned char cross_block_bits[] U8X8_PROGMEM = {
 void display_test_bitmap_modes(byte y_offset, byte frame, bool transparent) {
   if (!transparent) {
     lander_display.setBitmapMode(false /* solid */);
-    drawCenteredString(y_offset, "Solid bitmap");
-    // lander_display.drawStr(0, 0, "Solid bitmap");
+    drawCenteredString(0, y_offset, "Solid bitmap");
   } else {
     lander_display.setBitmapMode(true /* transparent*/);
-    drawCenteredString(y_offset, "Transparent bitmap");
-    // lander_display.drawStr(0, 0, "Transparent bitmap");
+    drawCenteredString(0, y_offset, "Transparent bitmap");
   }
 
   int test_offset = y_offset + lander_display.getMaxCharHeight();
-  // lander_display.setCursor(0, test_offset);
-  // lander_display.print(test_offset);
   const byte frame_size = CROSS_HEIGHT + 4;
-  // 0, 36, 60, 44
-  // lander_display.drawBox(0, test_offset + frame_size * 0.5,
-  //                        frame_size * 5, test_offset + frame_size);
   lander_display.drawBox(0, test_offset,
                          frame_size * 5, frame_size/2);
   lander_display.setDrawColor(0);  // Black
@@ -345,8 +344,7 @@ void display_test_bitmap_overlay(byte y_offset, byte frame) {
   byte frame_size = CROSS_FILL_HEIGHT + 4;
   byte frame_padding = 5;
 
-  drawCenteredString(y_offset, "Bitmap overlay");
-  // lander_display.drawStr(0, 0, "Bitmap overlay");
+  drawCenteredString(0, y_offset, "Bitmap overlay");
 
   int test_offset = y_offset + lander_display.getMaxCharHeight();
   lander_display.setBitmapMode(false /* solid */);

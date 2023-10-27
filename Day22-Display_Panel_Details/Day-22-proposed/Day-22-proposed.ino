@@ -29,6 +29,7 @@
 
 // Explicitly include Arduino.h
 #include "Arduino.h"
+#include "Wire.h"
 
 /*
  * Refer to the Day 21 lesson for instructions on how to install the U8g2
@@ -79,7 +80,7 @@ void loop(void) {
     // by the maximum character height of our selected font.
     byte y_offset = lander_display.getMaxCharHeight();  // maximum height of current font
 
-    // display_frame = (display_frame & 7) | (0 << 3);
+    display_frame = (display_frame & 7) | (1 << 3);
     switch (display_frame >> 3) {
       case 0: display_test_ready(y_offset, display_frame & 7); break;
       case 1: display_test_box_frame(y_offset, display_frame & 7); break;
@@ -130,7 +131,7 @@ void display_lander(byte x_location, byte y_location) {
 // Page 0: Display lander drawing and blinking begin message
 void display_test_ready(byte y_offset, byte frame) {
   // Y value halfway between top and bottom of drawable area
-  byte y_center = y_offset + ((lander_display.getDisplayHeight() - y_offset) / 2);
+  const byte Y_CENTER = y_offset + ((lander_display.getDisplayHeight() - y_offset) / 2);
 
   // Since our lander drawing's location is set using the upper-left
   // coordinates we will subtract half our drawing's height to center
@@ -139,8 +140,8 @@ void display_test_ready(byte y_offset, byte frame) {
   // We will also shift it right by adding a "padding" amount to the
   // lander's X coordinate.
   const byte LANDER_PADDING = LANDER_WIDTH;   // shift lander right by its width
-  byte lander_y_offset = y_center - (LANDER_HEIGHT / 2);
-  display_lander(LANDER_PADDING, lander_y_offset);
+  const byte LANDER_Y_CENTER = Y_CENTER - (LANDER_HEIGHT / 2);
+  display_lander(LANDER_PADDING, LANDER_Y_CENTER);
 
   // Blink the "ready" message by only displaying it every other frame
   // by extracting the rightmost bit of our frame number and only displaying
@@ -148,35 +149,55 @@ void display_test_ready(byte y_offset, byte frame) {
   if ((frame & 0b00000001) == 0) {
     // Determine remaining space to the right of our lander for our message.
     // The lander image extends from its starting X position plus its width.
-    byte x_offset = LANDER_PADDING + LANDER_WIDTH;
+    const byte X_OFFSET = LANDER_PADDING + LANDER_WIDTH;
 
     // get the height of each text line since it's used multiple times below
     byte text_height = lander_display.getMaxCharHeight();
 
     lander_display.setFontPosCenter();  // Y coordinate relative to center of font height
     // Display line 1 on display, one line above center
-    drawCenteredString(x_offset, y_center - text_height, "Begin");
+    drawCenteredString(X_OFFSET, Y_CENTER - text_height, "Begin");
 
     // Display line 2, vertically centered in space below title
-    drawCenteredString(x_offset, y_center, "Hardware");
+    drawCenteredString(X_OFFSET, Y_CENTER, "Hardware");
 
     // Display line 3 on display, one line below center
-    drawCenteredString(x_offset, y_center + text_height, "Test");
+    drawCenteredString(X_OFFSET, Y_CENTER + text_height, "Test");
   }
 }
 
-// Display filled and hollow boxes.
+// Page 1: Display filled and hollow boxes with one moving every frame.
+
+// Here we define constants for our box size and coordinates.  This is
+// done so they can be changed in one place, and it also makes it clear
+// what the MEANINGS of each number are in the code below.  It changes
+// code like:
+// .drawBox(5,10,20,10);
+// to:
+// .drawBox(BOX1_X_OFFSET, y_offset, BOX1_WIDTH, BOX1_HEIGHT);
+const byte BOX1_WIDTH = 20;
+const byte BOX1_HEIGHT = 10;
+const byte BOX1_X_OFFSET = 5;
+const byte BOX2_X_OFFSET = BOX1_X_OFFSET * 2;
+const byte BOX2_Y_OFFSET = BOX1_HEIGHT / 2;
+
 void display_test_box_frame(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "drawBox");
-  lander_display.drawBox(5, y_offset + 10, 20, 10);
-  lander_display.drawBox(10 + frame, y_offset + 15, 30, 7);
+  y_offset += lander_display.getMaxCharHeight();
+  // Draw a line around a box at coordinates x, y with width and height.
+  lander_display.drawBox(BOX1_X_OFFSET, y_offset, BOX1_WIDTH, BOX1_HEIGHT);
+  lander_display.drawBox(BOX2_X_OFFSET + frame, y_offset + BOX2_Y_OFFSET,
+                         BOX1_WIDTH + 10, BOX1_HEIGHT - 2);
 
-  drawCenteredString(0, y_offset + 30, "drawFrame");
-  lander_display.drawFrame(5, y_offset + 10 + 30, 20, 10);
-  lander_display.drawFrame(10 + frame, y_offset + 15 + 30, 30, 7);
+  y_offset += BOX1_HEIGHT + (BOX1_HEIGHT - 2);
+  drawCenteredString(0, y_offset, "drawFrame");
+  y_offset += lander_display.getMaxCharHeight();
+  lander_display.drawFrame(BOX1_X_OFFSET, y_offset, 20, 10);
+  lander_display.drawFrame(BOX2_X_OFFSET + frame, y_offset + BOX2_Y_OFFSET,
+                           BOX1_WIDTH + 10, BOX1_HEIGHT - 2);
 }
 
-// Display filled and hollow circles.
+// Page 2: Display filled and hollow circles with one moving every frame.
 void display_test_circles(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "drawDisc");
   lander_display.drawDisc(10, y_offset + 18, 8);

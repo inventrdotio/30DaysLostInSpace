@@ -83,7 +83,9 @@ void loop(void) {
     // our current font to the current y_offset.
     y_offset += lander_display.getMaxCharHeight();  // maximum height of current font
 
-    // display_frame = (display_frame & 7) | (2 << 3);
+    // const byte DISPLAY_PAGE = 7;
+    // display_frame = (display_frame & 7) | (DISPLAY_PAGE << 3);
+
     // Now display the appropriate page for our current display_frame.
     // Since each page is displayed 8 times we shift the display_frame right
     // by 3 bits, which is a FAST way of dividing it by 8.
@@ -225,73 +227,125 @@ const byte CIRCLE2_X_OFFSET = CIRCLE1_DIAMETER + CIRCLE2_RADIUS;
 void display_test_circles(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "drawDisc");
   y_offset += lander_display.getMaxCharHeight();  // offset down by font height
-  // Center disc at x, y with radius.  Draw entire disc.
-  lander_display.drawDisc(CIRCLE1_X_OFFSET, y_offset + CIRCLE1_RADIUS, CIRCLE1_RADIUS, U8G2_DRAW_ALL);
+  // Center disc at x, y with radius.
+  lander_display.drawDisc(CIRCLE1_X_OFFSET, y_offset + CIRCLE1_RADIUS, CIRCLE1_RADIUS);
   // Draw second (moving) disc 
   lander_display.drawDisc(CIRCLE2_X_OFFSET + frame, y_offset + CIRCLE2_RADIUS, CIRCLE2_RADIUS);
 
   y_offset += CIRCLE1_DIAMETER;
   drawCenteredString(0, y_offset, "drawCircle");
   y_offset += lander_display.getMaxCharHeight();  // offset down by font height
-  lander_display.drawCircle(CIRCLE1_X_OFFSET, y_offset + CIRCLE1_RADIUS, CIRCLE1_RADIUS, U8G2_DRAW_ALL);
+  // Draw hollow circle at x, y with radius
+  lander_display.drawCircle(CIRCLE1_X_OFFSET, y_offset + CIRCLE1_RADIUS, CIRCLE1_RADIUS);
+  // Draw second (moving) hollow circle
   lander_display.drawCircle(CIRCLE2_X_OFFSET + frame, y_offset + CIRCLE2_RADIUS, CIRCLE2_RADIUS);
 }
 
-// Display filled and hollow boxes with rounded corners
+/////////////////////////////////////////////////////////////////////
+// Page 3: Display filled and hollow boxes with rounded corners
+
+const byte RBOX1_WIDTH = 40;
+const byte RBOX1_HEIGHT = 30;
+const byte RBOX1_X_OFFSET = 5;
+const byte RBOX2_WIDTH = 25;
+const byte RBOX2_HEIGHT = 40;
+const byte RBOX2_X_OFFSET = RBOX1_X_OFFSET + RBOX1_WIDTH + RBOX1_X_OFFSET;
+
 void display_test_r_frame(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "drawRFrame/Box");
-  lander_display.drawRFrame(5, y_offset + 10, 40, 30, frame + 1);
-  lander_display.drawRBox(50, y_offset + 10, 25, 40, frame + 1);
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+
+  lander_display.drawRFrame(RBOX1_X_OFFSET, y_offset, RBOX1_WIDTH, RBOX1_HEIGHT, frame + 1);
+  lander_display.drawRBox(RBOX2_X_OFFSET, y_offset, RBOX2_WIDTH, RBOX2_HEIGHT, frame + 1);
 }
 
+/////////////////////////////////////////////////////////////////////
+// Page 4: Display text strings, drawing them in different directions
+
+const byte STRING_X_OFFSET = 30;
+
 void display_test_string(byte y_offset, byte frame) {
-  int test_offset = y_offset + 31;
-  lander_display.drawStr(30 + frame, test_offset, " 0");
-  lander_display.setFontDirection(1);
-  lander_display.drawStr(30, test_offset + frame, " 90");
-  lander_display.setFontDirection(2);
-  lander_display.drawStr(30 - frame, test_offset, " 180");
-  lander_display.setFontDirection(3);
-  lander_display.drawStr(30, test_offset - frame, " 270");
-  lander_display.setFontDirection(0);
+  byte y_center = y_offset + (lander_display.getDisplayHeight() - y_offset) / 2;
+
+  lander_display.setFontDirection(0);   // left to right
+  lander_display.drawStr(STRING_X_OFFSET + frame, y_center, " 0");
+
+  lander_display.setFontDirection(1);   // up to down
+  lander_display.drawStr(STRING_X_OFFSET, y_center + frame, " 90");
+
+  lander_display.setFontDirection(2);   // right to left (and upside down)
+  lander_display.drawStr(STRING_X_OFFSET - frame, y_center, " 180");
+
+  lander_display.setFontDirection(3);   // down to up
+  lander_display.drawStr(STRING_X_OFFSET, y_center - frame, " 270");
+
+  lander_display.setFontDirection(0);   // Restore normal left to right direction
 }
+
+/////////////////////////////////////////////////////////////////////
+// Page 5: Display lines at different angles
+
+const byte LINE_X_OFFSET = 7;
+const byte LINE_Y_MAX = 55;
 
 void display_test_line(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "drawLine");
-  int test_offset = y_offset + lander_display.getMaxCharHeight();
-  lander_display.drawLine(7 + frame, test_offset, 40, 55);
-  lander_display.drawLine(7 + frame * 2, test_offset, 60, 55);
-  lander_display.drawLine(7 + frame * 3, test_offset, 80, 55);
-  lander_display.drawLine(7 + frame * 4, test_offset, 100, 55);
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+
+  // Draw lines from x1/y1 to x2/y2, moving x1 each frame.
+  lander_display.drawLine(LINE_X_OFFSET + frame, y_offset,
+                          40, LINE_Y_MAX);
+  lander_display.drawLine(LINE_X_OFFSET + frame * 2, y_offset,
+                          60, LINE_Y_MAX);
+  lander_display.drawLine(LINE_X_OFFSET + frame * 3, y_offset,
+                          80, LINE_Y_MAX);
+  lander_display.drawLine(LINE_X_OFFSET + frame * 4, y_offset,
+                          100, LINE_Y_MAX);
 }
+
+/////////////////////////////////////////////////////////////////////
+// Page 6: Display triangles that separate each frame
 
 void display_test_triangle(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "drawTriangle");
 
-  int test_offset = y_offset + lander_display.getMaxCharHeight();
-  lander_display.drawTriangle(14, test_offset + 7,
-                              45, test_offset + 20,
-                              10, test_offset + 30);
-  lander_display.drawTriangle(14 + frame, test_offset + 7 - frame,
-                              45 + frame, test_offset + 20 - frame,
-                              57 + frame, test_offset + 00 - frame);
-  lander_display.drawTriangle(57 + frame * 2, test_offset + 0,
-                              45 + frame * 2, test_offset + 20,
-                              96 + frame * 2, test_offset + 43);
-  lander_display.drawTriangle(10 + frame, test_offset + 30 + frame,
-                              45 + frame, test_offset + 20 + frame,
-                              96 + frame, test_offset + 43 + frame);
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+  lander_display.drawTriangle(14, y_offset + 7,
+                              45, y_offset + 20,
+                              10, y_offset + 30);
+  lander_display.drawTriangle(14 + frame, y_offset + 7 - frame,
+                              45 + frame, y_offset + 20 - frame,
+                              57 + frame, y_offset + 00 - frame);
+  lander_display.drawTriangle(57 + frame * 2, y_offset + 0,
+                              45 + frame * 2, y_offset + 20,
+                              96 + frame * 2, y_offset + 43);
+  lander_display.drawTriangle(10 + frame, y_offset + 30 + frame,
+                              45 + frame, y_offset + 20 + frame,
+                              96 + frame, y_offset + 43 + frame);
 }
 
+/////////////////////////////////////////////////////////////////////
+// Page 7: Display characters from first ASCII page
+
+const byte FIRST_PRINTABLE_CHARACTER = 32;  // ASCII character 32 is first printable character
 void display_test_ascii_1(byte y_offset) {
-  char s[2] = " ";
-  byte x, y;
   drawCenteredString(0, y_offset, "ASCII page 1");
-  int test_offset = y_offset + lander_display.getMaxCharHeight();
-  for (y = 0; y < 6; y++) {
-    for (x = 0; x < 16; x++) {
-      s[0] = y * 16 + x + 32;
-      lander_display.drawStr(x * 7, y * lander_display.getMaxCharHeight() + test_offset, s);
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+
+  // For more characters visible you can uncomment the following line for a smaller font
+  // lander_display.setFont(u8g2_font_spleen5x8_mf);
+  byte character_width = lander_display.getMaxCharWidth();
+  byte column_count = lander_display.getDisplayWidth() / character_width;
+  byte row_count = (lander_display.getDisplayHeight() - y_offset) / lander_display.getMaxCharHeight();
+
+  for (byte row = 0; row < row_count; row++) {
+    for (byte column = 0; column < column_count; column++) {
+      char character_string[2];  // space for character plus null terminator
+      byte character_number = FIRST_PRINTABLE_CHARACTER + (row * column_count) + column;
+      snprintf(character_string, sizeof(character_string), "%c", character_number);
+      lander_display.drawStr(column * character_width,
+                             y_offset + (row * lander_display.getMaxCharHeight()),
+                             character_string);
     }
   }
 }

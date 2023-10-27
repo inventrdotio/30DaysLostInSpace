@@ -73,28 +73,37 @@ void loop(void) {
     lander_display.setFontRefHeightExtendedText();
     lander_display.setFontPosTop();
 
+    // y_offset is current Y coordinate below all previously drawn content
+    byte y_offset = 0;    // start at top of display
+
     // Title line for our display displayed on each screen
     drawCenteredString(0, 0, "Exploration Lander");  // Center title at top of display
 
-    // To leave the title above each display we offset the y starting point
-    // by the maximum character height of our selected font.
-    byte y_offset = lander_display.getMaxCharHeight();  // maximum height of current font
+    // To leave the title above each display we add the maximum character height of
+    // our current font to the current y_offset.
+    y_offset += lander_display.getMaxCharHeight();  // maximum height of current font
 
-    display_frame = (display_frame & 7) | (1 << 3);
+    // display_frame = (display_frame & 7) | (2 << 3);
+    // Now display the appropriate page for our current display_frame.
+    // Since each page is displayed 8 times we shift the display_frame right
+    // by 3 bits, which is a FAST way of dividing it by 8.
     switch (display_frame >> 3) {
-      case 0: display_test_ready(y_offset, display_frame & 7); break;
-      case 1: display_test_box_frame(y_offset, display_frame & 7); break;
-      case 2: display_test_circles(y_offset, display_frame & 7); break;
-      case 3: display_test_r_frame(y_offset, display_frame & 7); break;
-      case 4: display_test_string(y_offset, display_frame & 7); break;
-      case 5: display_test_line(y_offset, display_frame & 7); break;
-      case 6: display_test_triangle(y_offset, display_frame & 7); break;
+      // The frame number for each page is contained in the rightmost 3
+      // bits of the current display_frame.  So here we remove the page
+      // number by using a bitwise AND to remove all but the last three bits.
+      case 0: display_test_ready(y_offset, display_frame & 0b00000111); break;
+      case 1: display_test_box_frame(y_offset, display_frame & 0b00000111); break;
+      case 2: display_test_circles(y_offset, display_frame & 0b00000111); break;
+      case 3: display_test_r_frame(y_offset, display_frame & 0b00000111); break;
+      case 4: display_test_string(y_offset, display_frame & 0b00000111); break;
+      case 5: display_test_line(y_offset, display_frame & 0b00000111); break;
+      case 6: display_test_triangle(y_offset, display_frame & 0b00000111); break;
       case 7: display_test_ascii_1(y_offset); break;
       case 8: display_test_ascii_2(y_offset); break;
-      case 9: display_test_extra_page(y_offset, display_frame & 7); break;
-      case 10: display_test_bitmap_modes(y_offset, display_frame & 7, false); break;
-      case 11: display_test_bitmap_modes(y_offset, display_frame & 7, true); break;
-      case 12: display_test_bitmap_overlay(y_offset, display_frame & 7); break;
+      case 9: display_test_extra_page(y_offset, display_frame & 0b00000111); break;
+      case 10: display_test_bitmap_modes(y_offset, display_frame & 0b00000111, false); break;
+      case 11: display_test_bitmap_modes(y_offset, display_frame & 0b00000111, true); break;
+      case 12: display_test_bitmap_overlay(y_offset, display_frame & 0b00000111); break;
     }
     lander_display.sendBuffer();
     delay(50);
@@ -128,6 +137,7 @@ void display_lander(byte x_location, byte y_location) {
                               x_location + 20, y_location + 25);  // right nozzle
 }
 
+/////////////////////////////////////////////////////////////////////
 // Page 0: Display lander drawing and blinking begin message
 void display_test_ready(byte y_offset, byte frame) {
   // Y value halfway between top and bottom of drawable area
@@ -166,6 +176,7 @@ void display_test_ready(byte y_offset, byte frame) {
   }
 }
 
+/////////////////////////////////////////////////////////////////////
 // Page 1: Display filled and hollow boxes with one moving every frame.
 
 // Here we define constants for our box size and coordinates.  This is
@@ -178,34 +189,52 @@ void display_test_ready(byte y_offset, byte frame) {
 const byte BOX1_WIDTH = 20;
 const byte BOX1_HEIGHT = 10;
 const byte BOX1_X_OFFSET = 5;
+const byte BOX2_WIDTH = BOX1_WIDTH * 1.5;
+const byte BOX2_HEIGHT = BOX1_HEIGHT * .8;
 const byte BOX2_X_OFFSET = BOX1_X_OFFSET * 2;
 const byte BOX2_Y_OFFSET = BOX1_HEIGHT / 2;
 
 void display_test_box_frame(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "drawBox");
-  y_offset += lander_display.getMaxCharHeight();
-  // Draw a line around a box at coordinates x, y with width and height.
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+  // Draw a filled box at x, y, width, height.
   lander_display.drawBox(BOX1_X_OFFSET, y_offset, BOX1_WIDTH, BOX1_HEIGHT);
+  // Draw a second box offset offset and moving right each frame
   lander_display.drawBox(BOX2_X_OFFSET + frame, y_offset + BOX2_Y_OFFSET,
-                         BOX1_WIDTH + 10, BOX1_HEIGHT - 2);
+                         BOX2_WIDTH, BOX2_HEIGHT);
 
-  y_offset += BOX1_HEIGHT + (BOX1_HEIGHT - 2);
+  y_offset += BOX2_Y_OFFSET + BOX2_HEIGHT;  // offset down by drawn boxes
   drawCenteredString(0, y_offset, "drawFrame");
-  y_offset += lander_display.getMaxCharHeight();
-  lander_display.drawFrame(BOX1_X_OFFSET, y_offset, 20, 10);
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+  // Draw box frame at x, y, width, height.
+  lander_display.drawFrame(BOX1_X_OFFSET, y_offset, BOX1_WIDTH, BOX1_HEIGHT);
+  // Draw second box frame offset and moving right each frame
   lander_display.drawFrame(BOX2_X_OFFSET + frame, y_offset + BOX2_Y_OFFSET,
-                           BOX1_WIDTH + 10, BOX1_HEIGHT - 2);
+                           BOX2_WIDTH, BOX2_HEIGHT);
 }
 
+/////////////////////////////////////////////////////////////////////
 // Page 2: Display filled and hollow circles with one moving every frame.
+
+const byte CIRCLE1_RADIUS = 8;
+const byte CIRCLE1_DIAMETER = (CIRCLE1_RADIUS * 2) + 1;   // Diameter is (radius * 2) + 1
+const byte CIRCLE1_X_OFFSET = CIRCLE1_RADIUS;
+const byte CIRCLE2_RADIUS = CIRCLE1_RADIUS - 1;
+const byte CIRCLE2_X_OFFSET = CIRCLE1_DIAMETER + CIRCLE2_RADIUS;
+
 void display_test_circles(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "drawDisc");
-  lander_display.drawDisc(10, y_offset + 18, 8);
-  lander_display.drawDisc(24 + frame, y_offset + 16, 7);
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+  // Center disc at x, y with radius.  Draw entire disc.
+  lander_display.drawDisc(CIRCLE1_X_OFFSET, y_offset + CIRCLE1_RADIUS, CIRCLE1_RADIUS, U8G2_DRAW_ALL);
+  // Draw second (moving) disc 
+  lander_display.drawDisc(CIRCLE2_X_OFFSET + frame, y_offset + CIRCLE2_RADIUS, CIRCLE2_RADIUS);
 
-  drawCenteredString(0, y_offset + 27, "drawCircle");
-  lander_display.drawCircle(10, y_offset + 18 + 27, 8);
-  lander_display.drawCircle(24 + frame, y_offset + 18 + 25, 6);
+  y_offset += CIRCLE1_DIAMETER;
+  drawCenteredString(0, y_offset, "drawCircle");
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+  lander_display.drawCircle(CIRCLE1_X_OFFSET, y_offset + CIRCLE1_RADIUS, CIRCLE1_RADIUS, U8G2_DRAW_ALL);
+  lander_display.drawCircle(CIRCLE2_X_OFFSET + frame, y_offset + CIRCLE2_RADIUS, CIRCLE2_RADIUS);
 }
 
 // Display filled and hollow boxes with rounded corners

@@ -83,7 +83,9 @@ void loop(void) {
     // our current font to the current y_offset.
     y_offset += lander_display.getMaxCharHeight();  // maximum height of current font
 
-    // const byte DISPLAY_PAGE = 7;
+    // If you'd like to just view a single page just uncomment the next two lines and
+    // set the page desired in the first line.
+    // const byte DISPLAY_PAGE = 12;
     // display_frame = (display_frame & 7) | (DISPLAY_PAGE << 3);
 
     // Now display the appropriate page for our current display_frame.
@@ -108,7 +110,7 @@ void loop(void) {
       case 12: display_test_bitmap_overlay(y_offset, display_frame & 0b00000111); break;
     }
     lander_display.sendBuffer();
-    delay(50);
+    delay(100);
   }
 }
 
@@ -350,37 +352,53 @@ void display_test_ascii_1(byte y_offset) {
   }
 }
 
+/////////////////////////////////////////////////////////////////////
+// Page 8: Display characters from second ASCII page
+
 void display_test_ascii_2(byte y_offset) {
-  char s[2] = " ";
-  byte x, y;
   drawCenteredString(0, y_offset, "ASCII page 2");
-  int test_offset = y_offset + lander_display.getMaxCharHeight();
-  for (y = 0; y < 6; y++) {
-    for (x = 0; x < 16; x++) {
-      s[0] = y * 16 + x + 160;
-      lander_display.drawStr(x * 7, y * lander_display.getMaxCharHeight() + test_offset, s);
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+
+  // For more characters visible you can uncomment the following line for a smaller font
+  // lander_display.setFont(u8g2_font_spleen5x8_mf);
+  byte character_width = lander_display.getMaxCharWidth();
+  byte column_count = lander_display.getDisplayWidth() / character_width;
+  byte row_count = (lander_display.getDisplayHeight() - y_offset) / lander_display.getMaxCharHeight();
+
+  for (byte row = 0; row < row_count; row++) {
+    for (byte column = 0; column < column_count; column++) {
+      char character_string[2];  // space for character plus null terminator
+      byte character_number = FIRST_PRINTABLE_CHARACTER + 128 + (row * column_count) + column;
+      snprintf(character_string, sizeof(character_string), "%c", character_number);
+      lander_display.drawStr(column * character_width,
+                             y_offset + (row * lander_display.getMaxCharHeight()),
+                             character_string);
     }
   }
 }
 
+/////////////////////////////////////////////////////////////////////
+// Page 9: Display characters from Unicode font
+
 void display_test_extra_page(byte y_offset, byte frame) {
   drawCenteredString(0, y_offset, "Unicode");
-  int test_offset = y_offset + lander_display.getMaxCharHeight();
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
+
   lander_display.setFont(u8g2_font_unifont_t_symbols);
   lander_display.setFontPosTop();
-  lander_display.drawUTF8(0, test_offset, "☀ ☁");
+  lander_display.drawUTF8(0, y_offset, "☀ ☁");
   switch (frame) {
     case 0:
     case 1:
     case 2:
     case 3:
-      lander_display.drawUTF8(frame * 3, test_offset + 20, "☂");
+      lander_display.drawUTF8(frame * 3, y_offset + 20, "☂");
       break;
     case 4:
     case 5:
     case 6:
     case 7:
-      lander_display.drawUTF8(frame * 3, test_offset + 20, "☔");
+      lander_display.drawUTF8(frame * 3, y_offset + 20, "☔");
       break;
   }
 }
@@ -412,6 +430,9 @@ static const unsigned char cross_block_bits[] U8X8_PROGMEM = {
   0xC1, 0x20, 0xC1, 0x20, 0x01, 0x20, 0x01, 0x20, 0x01, 0x20, 0x01, 0x20, 
   0x01, 0x20, 0xFF, 0x3F, };
 
+/////////////////////////////////////////////////////////////////////
+// Pages 10 and 11: Display bitmap modes (non-transparent / transparent)
+
 void display_test_bitmap_modes(byte y_offset, byte frame, bool transparent) {
   if (!transparent) {
     lander_display.setBitmapMode(false /* solid */);
@@ -421,28 +442,31 @@ void display_test_bitmap_modes(byte y_offset, byte frame, bool transparent) {
     drawCenteredString(0, y_offset, "Transparent bitmap");
   }
 
-  int test_offset = y_offset + lander_display.getMaxCharHeight();
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
   const byte frame_size = CROSS_HEIGHT + 4;
-  lander_display.drawBox(0, test_offset,
+  lander_display.drawBox(0, y_offset,
                          frame_size * 5, frame_size/2);
   lander_display.setDrawColor(0);  // Black
-  lander_display.drawXBMP(frame_size * 0.5, test_offset + (frame_size/2)-(CROSS_HEIGHT/2),
+  lander_display.drawXBMP(frame_size * 0.5, y_offset + (frame_size/2)-(CROSS_HEIGHT/2),
                           CROSS_WIDTH, CROSS_HEIGHT, cross_bits);
   lander_display.setDrawColor(1);  // White
-  lander_display.drawXBMP(frame_size * 2, test_offset + (frame_size/2)-(CROSS_HEIGHT/2),
+  lander_display.drawXBMP(frame_size * 2, y_offset + (frame_size/2)-(CROSS_HEIGHT/2),
                           CROSS_WIDTH, CROSS_HEIGHT, cross_bits);
   lander_display.setDrawColor(2);  // XOR
-  lander_display.drawXBMP(frame_size * 3.5, test_offset + (frame_size/2)-(CROSS_HEIGHT/2),
+  lander_display.drawXBMP(frame_size * 3.5, y_offset + (frame_size/2)-(CROSS_HEIGHT/2),
                           CROSS_WIDTH, CROSS_HEIGHT, cross_bits);
   lander_display.setDrawColor(1);   // restore default color
 
-  lander_display.drawStr(frame_size * 0.5, test_offset + frame_size, "Black");
-  lander_display.drawStr(frame_size * 2, test_offset + frame_size, "White");
-  lander_display.drawStr(frame_size * 3.5, test_offset + frame_size, "XOR");
+  lander_display.drawStr(frame_size * 0.5, y_offset + frame_size, "Black");
+  lander_display.drawStr(frame_size * 2, y_offset + frame_size, "White");
+  lander_display.drawStr(frame_size * 3.5, y_offset + frame_size, "XOR");
   if (frame == 7) {
     delay(1000);
   }
 }
+
+/////////////////////////////////////////////////////////////////////
+// Pages 12: Display bitmap overlay mode
 
 void display_test_bitmap_overlay(byte y_offset, byte frame) {
   byte frame_size = CROSS_FILL_HEIGHT + 4;
@@ -450,29 +474,29 @@ void display_test_bitmap_overlay(byte y_offset, byte frame) {
 
   drawCenteredString(0, y_offset, "Bitmap overlay");
 
-  int test_offset = y_offset + lander_display.getMaxCharHeight();
+  y_offset += lander_display.getMaxCharHeight();  // offset down by font height
   lander_display.setBitmapMode(false /* solid */);
-  lander_display.drawFrame(0, test_offset, frame_size, frame_size);
+  lander_display.drawFrame(0, y_offset, frame_size, frame_size);
   lander_display.drawXBMP((frame_size / 2) - (CROSS_FILL_WIDTH / 2),
-                          test_offset + (frame_size / 2) - (CROSS_FILL_HEIGHT / 2),
+                          y_offset + (frame_size / 2) - (CROSS_FILL_HEIGHT / 2),
                           CROSS_WIDTH, CROSS_HEIGHT, cross_bits);
   if (frame & 4)
     lander_display.drawXBMP((frame_size / 2) - (CROSS_BLOCK_WIDTH / 2),
-                            test_offset + (frame_size / 2) - (CROSS_BLOCK_HEIGHT / 2),
+                            y_offset + (frame_size / 2) - (CROSS_BLOCK_HEIGHT / 2),
                             CROSS_BLOCK_WIDTH, CROSS_BLOCK_HEIGHT, cross_block_bits);
 
   lander_display.setBitmapMode(true /* transparent*/);
-  lander_display.drawFrame(frame_size + frame_padding, test_offset,
+  lander_display.drawFrame(frame_size + frame_padding, y_offset,
                            frame_size, frame_size);
   lander_display.drawXBMP(frame_size + frame_padding + (frame_size / 2) - (CROSS_FILL_WIDTH / 2),
-                          test_offset + (frame_size / 2) - (CROSS_FILL_HEIGHT / 2),
+                          y_offset + (frame_size / 2) - (CROSS_FILL_HEIGHT / 2),
                           CROSS_WIDTH, CROSS_HEIGHT, cross_bits);
   if (frame & 4)
     lander_display.drawXBMP(frame_size + frame_padding + (frame_size / 2) - (CROSS_BLOCK_WIDTH / 2),
-                            test_offset + (frame_size / 2) - (CROSS_BLOCK_HEIGHT / 2),
+                            y_offset + (frame_size / 2) - (CROSS_BLOCK_HEIGHT / 2),
                             CROSS_BLOCK_WIDTH, CROSS_BLOCK_HEIGHT, cross_block_bits);
 
-  lander_display.drawStr(0, test_offset + frame_size, "Solid / transparent");
+  lander_display.drawStr(0, y_offset + frame_size, "Solid / transparent");
   if (frame == 7) {
     delay(1000);
   }

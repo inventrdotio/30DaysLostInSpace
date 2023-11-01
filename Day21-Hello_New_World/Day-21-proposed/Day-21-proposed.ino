@@ -32,6 +32,7 @@
  * - Computer character fonts
  * - U8g2 graphics library for monochrome displays
  * - Logical Not operator ('!')
+ * - clearBuffer()/sendBuffer() method for OLED display updates
  *
  * Parts and electronics concepts introduced in this lesson.
  * - SH1106 monochrome 128x64 pixel OLED display.
@@ -60,7 +61,9 @@
  *
  * The documentation for this library lists all of the displays supported along
  * with the corresponding constructors and options.  This constructor is for our
- * SH1106, 128x64 pixel generic display and also indicates that we will be using
+ * SH1106, 128x64 pixel generic display.  The "_F_" indicates that we will use
+ * a full-sized graphics buffer and the clearBuffer()/sendBuffer() methods to
+ * update the entire display at once. The "HW_I2C" indicates that we will be using
  * I2C communications with this display.
  */
 U8G2_SH1106_128X64_NONAME_F_HW_I2C lander_display(U8G2_R0, /* reset=*/U8X8_PIN_NONE);

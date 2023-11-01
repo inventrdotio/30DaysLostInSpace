@@ -32,10 +32,6 @@
 #include "Wire.h"
 
 /*
- * Refer to the Day 21 lesson for instructions on how to install the U8g2
- * library into the Arduino IDE.  We will use this library to display messages
- * on our OLED display.
- *
  * Extensive documentation for this library can be found at https://github.com/olikraus/u8g2
  * for those wanting to dive deeper, but we will explain all of the functions
  * used in these lessons.

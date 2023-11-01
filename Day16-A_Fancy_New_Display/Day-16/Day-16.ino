@@ -42,7 +42,7 @@ const byte CLK_PIN = 6;
 const byte DIO_PIN = 5;
 
 // Create display object of type TM1637Display:
-TM1637Display hero_display = TM1637Display(CLK_PIN, DIO_PIN);
+TM1637Display lander_display = TM1637Display(CLK_PIN, DIO_PIN);
 
 /*
  * The TM1637 library takes an array of 4 bytes to represent each of the 4 display
@@ -97,20 +97,20 @@ const byte done[] = {
 };
 
 void setup() {
-  hero_display.setBrightness(7);  // Configure the display brightness (0-7):
+  lander_display.setBrightness(7);  // Configure the display brightness (0-7):
 }
 
 void loop() {
   // Clear the display (all segments off)
-  hero_display.clear();
+  lander_display.clear();
   delay(1000);
 
   // Light up all segments of the display
-  hero_display.setSegments(all_on);
+  lander_display.setSegments(all_on);
   delay(1000);
 
   // Clear the display (all segments off)
-  hero_display.clear();
+  lander_display.clear();
   delay(1000);
 
   /*
@@ -135,9 +135,9 @@ void loop() {
    *        * 0.0:0.0 (0b11100000)
    */
   for (int i = 0; i < 4; i++) {
-    hero_display.showNumberDecEx(1200, 0b01000000);
+    lander_display.showNumberDecEx(1200, 0b01000000);
     delay(500);
-    hero_display.clear();
+    lander_display.clear();
     delay(500);
   }
 
@@ -145,17 +145,17 @@ void loop() {
   // NOTE: negative numbers cannot be less than -999 since the negative sign
   //       uses the left most digit of the display.
   for (int i = -100; i <= 100; i++) {
-    hero_display.showNumberDec(i);
+    lander_display.showNumberDec(i);
     delay(50);
   }
   delay(1000);
 
   // Clear the display (all segments off)
-  hero_display.clear();
+  lander_display.clear();
   delay(1000);
 
   // Display the message "dOnE"
-  hero_display.setSegments(done);
+  lander_display.setSegments(done);
 
   delay(10000);  // Delay 10 seconds and then repeat our demo.
 }

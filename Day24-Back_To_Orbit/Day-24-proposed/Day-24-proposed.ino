@@ -120,76 +120,90 @@ void loop() {
   static unsigned long previous_loop_time = timeRemaining;
 
   // Serial.println(timeRemaining);  // Display milliseconds remaining on serial console
-  if (timeRemaining > 0) {
-    Serial.print(timeRemaining);  // Display milliseconds remaining on serial console
-    Serial.print(" (");
-    Serial.print(previous_loop_time - timeRemaining);
-    Serial.print(") ");
-    Serial.println(liftoff_state);
-  }
+  // if (timeRemaining > 0) {
+  //   Serial.print(timeRemaining);  // Display milliseconds remaining on serial console
+  //   Serial.print(" (");
+  //   Serial.print(previous_loop_time - timeRemaining);
+  //   Serial.print(") ");
+  //   Serial.println(liftoff_state);
+  // }
   previous_loop_time = timeRemaining;
-
 
   byte thrust_lever = digitalRead(THRUST_LEVER_PIN);
   byte systems_lever = digitalRead(SYSTEMS_LEVER_PIN);
   byte confirm_lever = digitalRead(CONFIRM_LEVER_PIN);
 
   updateLanderDisplay(liftoff_state, thrust_lever, systems_lever, confirm_lever);
-  switch (liftoff_state) {
-    case INIT:
-      Serial.print("liftoff_state = ");
-      Serial.println(liftoff_state);
-      if (!thrust_lever && !systems_lever && !confirm_lever) {
-        liftoff_state = PENDING;
+  // switch (liftoff_state) {
+  //   case INIT:
+  if (liftoff_state == INIT) {
+    Serial.print(" INIT case ");
+    Serial.println(liftoff_state);
+    if (!thrust_lever && !systems_lever && !confirm_lever) {
+      liftoff_state = PENDING;
+    }
+    //   break;
+    // case PENDING:  // Waiting for all three switches to be turned on
+  } else if (liftoff_state == PENDING) {
+    Serial.print(" PENDING case ");
+    Serial.println(liftoff_state);
+    if (thrust_lever && systems_lever && confirm_lever) {
+      // blink the countdown on our timer before beginning the countdown
+      for (int i = 0; i < 3; i++) {
+        counter_display.clear();
+        delay(200);
+        displayCounter(COUNTDOWN_MILLISECONDS);
+        delay(200);
       }
-      break;
-    case PENDING:  // Waiting for all three switches to be turned on
-      Serial.print("liftoff_state = ");
-      Serial.println(liftoff_state);
-      if (thrust_lever && systems_lever && confirm_lever) {
-        // blink the countdown on our timer before beginning the countdown
-        for (int i = 0; i < 3; i++) {
-          counter_display.clear();
-          delay(200);
-          displayCounter(COUNTDOWN_MILLISECONDS);
-          delay(200);
-        }
-        Serial.println("Countdown started..: ");
-        countdown_start_time = millis();
-        liftoff_state = COUNTDOWN;
-      }
-      break;
-    case LIFTOFF:
-      Serial.print("liftoff_state = ");
-      Serial.println(liftoff_state);
-      Serial.println("Done!!");           // indicate completion on serial console
-      counter_display.setSegments(DONE);  // "dOnE" on our counter
+      Serial.println("Countdown started..: ");
+      countdown_start_time = millis();
+      liftoff_state = COUNTDOWN;
+    }
+    // break;
+    // case LIFTOFF:
+  } else if (liftoff_state == LIFTOFF) {
+    Serial.print(" LIFTOFF case ");
+    Serial.println(liftoff_state);
+    Serial.println("Done!!");           // indicate completion on serial console
+    counter_display.setSegments(DONE);  // "dOnE" on our counter
 
-      while (1) {
-        updateLanderDisplay(liftoff_state, true, true, true);
-      }
-      Serial.println("ERROR: SHOULDNT REACH");
-      break;
-    case COUNTDOWN:
-      Serial.print("liftoff_state = ");
-      Serial.println(liftoff_state);
-      // Update our remaining time by subtracting the start time from current
-      // execution time (in milliseconds).  If our elapsed time is greater
-      // than our countdown time then set remaining time to 0.
-      unsigned long elapsed_time = millis() - countdown_start_time;
-      if (elapsed_time < COUNTDOWN_MILLISECONDS) {
-        timeRemaining = COUNTDOWN_MILLISECONDS - elapsed_time;
-      } else {
-        timeRemaining = 0;
-        liftoff_state = LIFTOFF;
-      }
-      displayCounter(timeRemaining);  // Display minutes:seconds on counter display
-      break;
-    default:
-      Serial.print("liftoff_state = ");
-      Serial.println(liftoff_state);
-      // case ABORT:
-      break;
+    while (1) {
+      updateLanderDisplay(liftoff_state, true, true, true);
+    }
+    Serial.println("ERROR: SHOULDNT REACH");
+    //   break;
+    // case COUNTDOWN:
+  } else if (liftoff_state == COUNTDOWN) {
+    Serial.print(" COUNTDOWN case ");
+    Serial.println(liftoff_state);
+    // Update our remaining time by subtracting the start time from current
+    // execution time (in milliseconds).  If our elapsed time is greater
+    // than our countdown time then set remaining time to 0.
+    unsigned long elapsed_time = millis() - countdown_start_time;
+    if (elapsed_time < COUNTDOWN_MILLISECONDS) {
+      timeRemaining = COUNTDOWN_MILLISECONDS - elapsed_time;
+    } else {
+      timeRemaining = 0;
+      liftoff_state = LIFTOFF;
+    }
+    // if any switch is turned off during countdown then we abort takeoff.
+    if (!thrust_lever || !systems_lever || !confirm_lever) {
+      liftoff_state = ABORT;
+    }
+    displayCounter(timeRemaining);  // Display minutes:seconds on counter display
+    //   break;
+    // case ABORT:
+  } else if (liftoff_state == ABORT) {
+    Serial.print(" ABORT case ");
+    Serial.println(liftoff_state);
+    delay(5000);           // show display for 5 seconds
+    liftoff_state = INIT;  // set state back to INIT (waiting for all OFF)
+                           // break;
+  } else {
+    // default:
+    Serial.print(" DEFAULT case ");
+    Serial.println(liftoff_state);
+    // break;
   }
 
   const unsigned long MIN_LOOP_TIME = 200;  // minimum 200 ms time per loop
@@ -206,11 +220,14 @@ void loop() {
   blink_state = !blink_state;
 }
 
+const byte MAX_LANDER_SPEED = 5;
+
 void updateLanderDisplay(enum LIFTOFF_STATE liftoff_state,
                          bool thruster_lever,
                          bool systems_lever,
                          bool confirm_lever) {
   static int lander_height = lander_display.getDisplayHeight() - LANDER_HEIGHT;
+  static byte current_lander_speed = 1;
 
   lander_display.firstPage();
   do {
@@ -227,6 +244,26 @@ void updateLanderDisplay(enum LIFTOFF_STATE liftoff_state,
       static byte text_width = lander_display.getStrWidth(LIFTOFF_TEXT);
       static byte x_left = ((lander_display.getDisplayWidth() - LANDER_WIDTH) / 2) - (text_width / 2);
       lander_display.drawStr(x_left, y_center, LIFTOFF_TEXT);
+
+      // Set height of lander image on screen to animate liftoff image, increasing speed
+      // to MAX during liftoff.
+      if (lander_height > -LANDER_HEIGHT) {
+        lander_height -= current_lander_speed;
+      } else {
+        lander_height = lander_display.getDisplayHeight();  // start again at bottom of screen
+      }
+      if (current_lander_speed < MAX_LANDER_SPEED) {
+        current_lander_speed += 1;
+      }
+    } else if (liftoff_state == ABORT) {
+      const char ABORT_TEXT[] = "ABORTED!";
+      // Display liftoff in center of available space
+      byte y_center = y_offset + ((lander_display.getDisplayHeight() - y_offset) / 2);
+      // Serial.println(y_center);
+      lander_display.setFontPosCenter();  // display text vertically centered
+      static byte text_width = lander_display.getStrWidth(ABORT_TEXT);
+      static byte x_left = ((lander_display.getDisplayWidth() - LANDER_WIDTH) / 2) - (text_width / 2);
+      lander_display.drawStr(x_left, y_center, ABORT_TEXT);
     } else {
       // Set y_offset to point four lines above bottom of display
       y_offset = lander_display.getDisplayHeight() - (4 * lander_display.getMaxCharHeight());
@@ -238,45 +275,44 @@ void updateLanderDisplay(enum LIFTOFF_STATE liftoff_state,
       y_offset = drawString(0, y_offset,
                             (String("Confirm  : ") + String(confirm_lever ? "ON" : "OFF")).c_str());
 
-      String liftoff_state_text;
-      switch (liftoff_state) {
-        case INIT:
-          liftoff_state_text = "Init";
-          break;
-        case PENDING:
-          liftoff_state_text = "Pending";
-          break;
-        case COUNTDOWN:
-          liftoff_state_text = "Active";
-          break;
-        case LIFTOFF:
-          liftoff_state_text = "Complete";
-          break;
-        case ABORT:
-          liftoff_state_text = "ABORT";
-          break;
-      }
-
       // Set y_offset to display text at bottom of display.
       y_offset = lander_display.getDisplayHeight() - lander_display.getMaxCharHeight();
-      drawString(0, y_offset, String("Countdown " + liftoff_state_text).c_str());
+      drawString(0, y_offset, (String("Countdown ") + liftoffStateToString(liftoff_state)).c_str());
     }
     // Draw a picture of our lander on right side of display, starting at the bottom
     displayLander(lander_display.getDisplayWidth() - LANDER_WIDTH,
                   lander_height);
   } while (lander_display.nextPage());
 
-  static byte speed = 1;
-  const byte MAX_SPEED = 5;
-  if (liftoff_state == LIFTOFF) {
-    if (lander_height > -LANDER_HEIGHT) {
-      lander_height -= speed;
-    } else {
-      lander_height = lander_display.getDisplayHeight();  // start again at bottom of screen
-    }
-    if (speed < MAX_SPEED) {
-      speed += 1;
-    }
+  // if (liftoff_state == LIFTOFF) {
+  //   if (lander_height > -LANDER_HEIGHT) {
+  //     lander_height -= current_lander_speed;
+  //   } else {
+  //     lander_height = lander_display.getDisplayHeight();  // start again at bottom of screen
+  //   }
+  //   if (current_lander_speed < MAX_LANDER_SPEED) {
+  //     current_lander_speed += 1;
+  //   }
+  // }
+}
+
+String liftoffStateToString(enum LIFTOFF_STATE liftoff_state) {
+  switch (liftoff_state) {
+    case INIT:
+      return ("Init");
+      break;
+    case PENDING:
+      return ("Pending");
+      break;
+    case COUNTDOWN:
+      return ("Active");
+      break;
+    case LIFTOFF:
+      return ("Complete");
+      break;
+    case ABORT:
+      return ("ABORT");
+      break;
   }
 }
 
@@ -313,8 +349,3 @@ void displayLander(byte x_location, int y_location) {
                               x_location + 15, y_location + 25,
                               x_location + 20, y_location + 25);  // right nozzle
 }
-
-// byte drawCenteredString(byte x, byte y, char *string) {
-//   byte centered_x = x + ((lander_display.getDisplayWidth() - x) - lander_display.getStrWidth(string)) / 2;
-//   lander_display.drawStr(centered_x, y, string);
-// }

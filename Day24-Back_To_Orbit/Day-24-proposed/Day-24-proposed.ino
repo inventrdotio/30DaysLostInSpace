@@ -247,14 +247,14 @@ void updateLanderDisplay(enum LIFTOFF_STATE liftoff_state,
 
       // Set height of lander image on screen to animate liftoff image, increasing speed
       // to MAX during liftoff.
-      if (lander_height > -LANDER_HEIGHT) {
-        lander_height -= current_lander_speed;
-      } else {
-        lander_height = lander_display.getDisplayHeight();  // start again at bottom of screen
-      }
-      if (current_lander_speed < MAX_LANDER_SPEED) {
-        current_lander_speed += 1;
-      }
+      // if (lander_height > -LANDER_HEIGHT) {
+      //   lander_height -= current_lander_speed;
+      // } else {
+      //   lander_height = lander_display.getDisplayHeight();  // start again at bottom of screen
+      // }
+      // if (current_lander_speed < MAX_LANDER_SPEED) {
+      //   current_lander_speed += 1;
+      // }
     } else if (liftoff_state == ABORT) {
       const char ABORT_TEXT[] = "ABORTED!";
       // Display liftoff in center of available space
@@ -284,16 +284,18 @@ void updateLanderDisplay(enum LIFTOFF_STATE liftoff_state,
                   lander_height);
   } while (lander_display.nextPage());
 
-  // if (liftoff_state == LIFTOFF) {
-  //   if (lander_height > -LANDER_HEIGHT) {
-  //     lander_height -= current_lander_speed;
-  //   } else {
-  //     lander_height = lander_display.getDisplayHeight();  // start again at bottom of screen
-  //   }
-  //   if (current_lander_speed < MAX_LANDER_SPEED) {
-  //     current_lander_speed += 1;
-  //   }
-  // }
+  // Set height of lander image on screen to animate liftoff image, increasing speed
+  // to MAX during liftoff.
+  if (liftoff_state == LIFTOFF) {
+    if (lander_height > -LANDER_HEIGHT) {
+      lander_height -= current_lander_speed;
+    } else {
+      lander_height = lander_display.getDisplayHeight();  // start again at bottom of screen
+    }
+    if (current_lander_speed < MAX_LANDER_SPEED) {
+      current_lander_speed += 1;
+    }
+  }
 }
 
 String liftoffStateToString(enum LIFTOFF_STATE liftoff_state) {

@@ -183,7 +183,7 @@ void loop() {
       y_offset = drawString(0, y_offset, "Systems: OFF");
       y_offset = drawString(0, y_offset, "Confirm: OFF");
       drawString(0, y_offset, "Countdown ABORT");
-      // Draw a picture of our lander int bottom right corner
+      // Draw a picture of our lander in bottom right corner
       displayLander(lander_display.getDisplayWidth() - LANDER_WIDTH,
                     lander_display.getDisplayHeight() - LANDER_HEIGHT);
     } while (lander_display.nextPage());

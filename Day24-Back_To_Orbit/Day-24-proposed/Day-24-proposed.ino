@@ -19,7 +19,8 @@
 
 /*
  * Arduino concepts introduced/documented in this lesson.
- * - 
+ * - enum
+ * - ternary operation
  *
  * Parts and electronics concepts introduced in this lesson.
  * - 
@@ -53,7 +54,7 @@ const byte THRUST_LEVER_PIN = 9;
 const byte SYSTEMS_LEVER_PIN = 8;
 const byte CONFIRM_LEVER_PIN = 7;
 
-const byte SPEAKER_PIN = 6;
+const byte BUZZER_PIN = 6;
 
 /*
  * This constructor for our OLED differs from the one used for the previous
@@ -108,12 +109,13 @@ void setup() {
 }
 
 // *********************************************
+const unsigned long MIN_LOOP_TIME = 200;  // minimum 200 ms time per loop
 void loop() {
-  // Initialize static variables first time through loop() that will retain values
-  // between loop() executions.
+  // Initialize static variables first time through loop().  After first time
+  // they will retain values between loop() executions.
   static unsigned long timeRemaining = COUNTDOWN_MILLISECONDS;
   static unsigned long countdown_start_time = 0;
-  static enum LIFTOFF_STATE liftoff_state = INIT;
+  static enum LIFTOFF_STATE liftoff_state = COUNTDOWN; //INIT;
   static bool blink_state = true;
 
   unsigned long loop_start_time = millis();
@@ -134,19 +136,19 @@ void loop() {
   byte confirm_lever = digitalRead(CONFIRM_LEVER_PIN);
 
   updateLanderDisplay(liftoff_state, thrust_lever, systems_lever, confirm_lever);
-  // switch (liftoff_state) {
-  //   case INIT:
+
   if (liftoff_state == INIT) {
-    Serial.print(" INIT case ");
-    Serial.println(liftoff_state);
+    if (blink_state) {
+      tone(BUZZER_PIN, 100);
+    } else {
+      noTone(BUZZER_PIN);
+    }
+
     if (!thrust_lever && !systems_lever && !confirm_lever) {
+      noTone(BUZZER_PIN);
       liftoff_state = PENDING;
     }
-    //   break;
-    // case PENDING:  // Waiting for all three switches to be turned on
   } else if (liftoff_state == PENDING) {
-    Serial.print(" PENDING case ");
-    Serial.println(liftoff_state);
     if (thrust_lever && systems_lever && confirm_lever) {
       // blink the countdown on our timer before beginning the countdown
       for (int i = 0; i < 3; i++) {
@@ -155,27 +157,10 @@ void loop() {
         displayCounter(COUNTDOWN_MILLISECONDS);
         delay(200);
       }
-      Serial.println("Countdown started..: ");
       countdown_start_time = millis();
       liftoff_state = COUNTDOWN;
     }
-    // break;
-    // case LIFTOFF:
-  } else if (liftoff_state == LIFTOFF) {
-    Serial.print(" LIFTOFF case ");
-    Serial.println(liftoff_state);
-    Serial.println("Done!!");           // indicate completion on serial console
-    counter_display.setSegments(DONE);  // "dOnE" on our counter
-
-    while (1) {
-      updateLanderDisplay(liftoff_state, true, true, true);
-    }
-    Serial.println("ERROR: SHOULDNT REACH");
-    //   break;
-    // case COUNTDOWN:
   } else if (liftoff_state == COUNTDOWN) {
-    Serial.print(" COUNTDOWN case ");
-    Serial.println(liftoff_state);
     // Update our remaining time by subtracting the start time from current
     // execution time (in milliseconds).  If our elapsed time is greater
     // than our countdown time then set remaining time to 0.
@@ -191,34 +176,37 @@ void loop() {
       liftoff_state = ABORT;
     }
     displayCounter(timeRemaining);  // Display minutes:seconds on counter display
-    //   break;
-    // case ABORT:
+  } else if (liftoff_state == LIFTOFF) {
+    counter_display.setSegments(DONE);  // "dOnE" on our counter
+
+    // Play TADA! tones followed by "liftoff rumble"
+    tone(BUZZER_PIN, 300);
+    delay(200);
+    tone(BUZZER_PIN, 500);
+    delay(400);
+    tone(BUZZER_PIN, 38, 5000);
+
+    // Animate final display forever.  This while loop runs until HERO is reset or
+    // new code is uploaded.
+    while (true) {
+      updateLanderDisplay(liftoff_state, true, true, true);
+    }
+    // THIS LINE IS NEVER REACHED
   } else if (liftoff_state == ABORT) {
-    Serial.print(" ABORT case ");
-    Serial.println(liftoff_state);
+    tone(BUZZER_PIN, 100, 1000);
     delay(5000);           // show display for 5 seconds
     liftoff_state = INIT;  // set state back to INIT (waiting for all OFF)
-                           // break;
-  } else {
-    // default:
-    Serial.print(" DEFAULT case ");
-    Serial.println(liftoff_state);
-    // break;
   }
 
-  const unsigned long MIN_LOOP_TIME = 200;  // minimum 200 ms time per loop
   unsigned long loop_time = millis() - loop_start_time;
-  // Serial.print("  ");
-  // Serial.print(loop_time);
   if (loop_time < MIN_LOOP_TIME) {
-    // Serial.print(", ");
-    // Serial.print(MIN_LOOP_TIME - loop_time);
     delay(MIN_LOOP_TIME - loop_time);  // delay remaining time
   }
-  // Serial.println();
 
   blink_state = !blink_state;
 }
+
+// *********************************************
 
 const byte MAX_LANDER_SPEED = 5;
 

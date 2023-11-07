@@ -78,8 +78,11 @@ const uint8_t DONE[] = {
   SEG_A | SEG_D | SEG_E | SEG_F | SEG_G           // E
 };
 
-// Define amount of time (in milliseconds) to count down.
-const unsigned long COUNTDOWN_MILLISECONDS = 5 * 1000;
+// Define amount of time (in milliseconds) to count down.  To ensure
+// that the calculation is done as an unsigned long we append "UL" to
+// the values below.  Without this the calculation is done in 16 bit
+// arithmetic which causes the value to wrap and be incorrect.
+const unsigned long COUNTDOWN_MILLISECONDS = 70UL * 1000UL;
 
 /*
  * The Arduino C++ provides the "enum" command to define multiple, related
@@ -142,8 +145,7 @@ void loop() {
   // during execution will be retained between loop() executions.
   static unsigned long timeRemaining = COUNTDOWN_MILLISECONDS;  // Time remaining before liftoff
   static unsigned long countdown_start_time;                    // millis() value when countdown begins
-  // static enum LIFTOFF_STATE liftoff_state = INIT;               // Begin sequence in INIT state
-  static enum LIFTOFF_STATE liftoff_state = COUNTDOWN;               // Begin sequence in INIT state
+  static enum LIFTOFF_STATE liftoff_state = INIT;               // Begin sequence in INIT state
 
   // Here we define a value that is toggled between true/false ever time through the loop
   // This can be used to create a beeping tone or could be used to blink text.
@@ -207,7 +209,7 @@ void loop() {
         displayCounter(COUNTDOWN_MILLISECONDS);
         delay(MIN_LOOP_TIME);
       }
-      countdown_start_time = millis();    // Save current millis() when countdown begins
+      countdown_start_time = millis();  // Save current millis() when countdown begins
       liftoff_state = COUNTDOWN;
     }
     // end of PENDING state
@@ -217,9 +219,9 @@ void loop() {
     // time then our countdown is complete and we set time remaining to 0 to prevent
     // the time remaining from going negative.
     unsigned long elapsed_time = millis() - countdown_start_time;
-    if (elapsed_time > COUNTDOWN_MILLISECONDS) {    // Countdown complete!
-      timeRemaining = 0;    // No time remaining
-      liftoff_state = LIFTOFF;  // initiate liftoff state
+    if (elapsed_time > COUNTDOWN_MILLISECONDS) {  // Countdown complete!
+      timeRemaining = 0;                          // No time remaining
+      liftoff_state = LIFTOFF;                    // initiate liftoff state
     } else {
       timeRemaining = COUNTDOWN_MILLISECONDS - elapsed_time;  // decrease time remaining
     }
@@ -230,15 +232,15 @@ void loop() {
     }
     displayCounter(timeRemaining);  // Display countdown time in minutes:seconds on counter display
     // end of COUNTDOWN state
-  } else if (liftoff_state == LIFTOFF) {    // Liftoff!
-    counter_display.setSegments(DONE);  // Display "dOnE" on our counter
+  } else if (liftoff_state == LIFTOFF) {  // Liftoff!
+    counter_display.setSegments(DONE);    // Display "dOnE" on our counter
 
     // Play TADA! tones followed by sound of our thrusters firing
     tone(BUZZER_PIN, 300);
     delay(200);
     tone(BUZZER_PIN, 500);
     delay(400);
-    tone(BUZZER_PIN, 38, 5000);   // Play engines for first 5 seconds
+    tone(BUZZER_PIN, 38, 5000);  // Play engines for first 5 seconds
 
     // Animate final display forever.  This while loop runs until HERO is reset or
     // new code is uploaded.  During liftoff the ship graphic moves up the right

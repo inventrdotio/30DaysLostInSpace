@@ -1,6 +1,6 @@
 /*
  * 30 Days - Lost in Space
- * Day 22 - Hello New World!
+ * Day 22 - Launch System
  *
  * Even our new OLED display is a bit small if we have large amounts of
  * information to display.  But this new display isn't limited to JUST

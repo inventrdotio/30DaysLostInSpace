@@ -1,6 +1,6 @@
 /*
  * 30 Days - Lost in Space
- * Day 22 - Hello New World!
+ * Day 24 - Back To Orbit
  *
  * Explorer, the day has arrived!  Let's get that lander up into space again.
  * We will initialize our systems by setting our Thruster, Systems and Confirmation

@@ -63,60 +63,85 @@ U8G2_SH1106_128X64_NONAME_2_HW_I2C lander_display(U8G2_R0, /* reset=*/U8X8_PIN_N
  */
 #include "switch_bitmaps.h"
 
+// Create an array of pointers to each of the bitmap images.
 const static char* SWITCH_BITMAPS[] = {
-  ZERO,
-  ONE,
-  TWO,
-  THREE,
-  FOUR,
-  FIVE,
-  SIX,
-  SEVEN,
+  SWITCHES_ZERO,
+  SWITCHES_ONE,
+  SWITCHES_TWO,
+  SWITCHES_THREE,
+  SWITCHES_FOUR,
+  SWITCHES_FIVE,
+  SWITCHES_SIX,
+  SWITCHES_SEVEN,
 };
 
 // Include file for 4 digit - 7 segment display library
 #include <TM1637Display.h>
-const byte COUNTER_DISPLAY_DIO_PIN = 2;
-const byte COUNTER_DISPLAY_CLK_PIN = 3;
-// Construct counter_display handle.
-TM1637Display counter_display(COUNTER_DISPLAY_CLK_PIN, COUNTER_DISPLAY_DIO_PIN);
+const byte BITMAP_NUMBER_DISPLAY_DIO_PIN = 2;
+const byte BITMAP_NUMBER_DISPLAY_CLK_PIN = 3;
+// Construct bitmap_number_display handle.
+TM1637Display bitmap_number_display(BITMAP_NUMBER_DISPLAY_CLK_PIN, BITMAP_NUMBER_DISPLAY_DIO_PIN);
 
 // Define pins for our DIP switches
-const byte THRUST_LEVER_PIN = A0;
-const byte SYSTEMS_LEVER_PIN = A1;
-const byte CONFIRM_LEVER_PIN = A2;
+// We will need almost all pins for Day 29, so here we show that we can use ANALOG
+// pins as digitial pins when necessary.
+const byte SWITCH_BIT_0_PIN = A2;  // switch for bit 0 of our 3 bit value
+const byte SWITCH_BIT_1_PIN = A1;  // switch for bit 1 of our 3 bit value
+const byte SWITCH_BIT_2_PIN = A0;  // switch for bit 2 of our 3 bit value
 
 // ************************************************
 void setup(void) {
   Serial.begin(9600);
+
   // Configure counter display
-  counter_display.setBrightness(7);  // Set maximum brightness (value is 0-7)
-  counter_display.clear();           // Clear the display
+  bitmap_number_display.setBrightness(7);  // Set maximum brightness (value is 0-7)
+  bitmap_number_display.clear();           // Clear the display
+
   // Configure DIP switch pins
-  pinMode(THRUST_LEVER_PIN, INPUT);   // Thrust lever pin
-  pinMode(SYSTEMS_LEVER_PIN, INPUT);  // Sysstems lever pin
-  pinMode(CONFIRM_LEVER_PIN, INPUT);  // Confirmation lever pin
+  pinMode(SWITCH_BIT_0_PIN, INPUT);  // switch for bit 0 of our 3 bit value
+  pinMode(SWITCH_BIT_1_PIN, INPUT);  // switch for bit 1 of our 3 bit value
+  pinMode(SWITCH_BIT_2_PIN, INPUT);  // switch for bit 2 of our 3 bit value
 
   lander_display.begin();  // initialize lander display
 }
 
 // ************************************************
 void loop(void) {
-
+  // Calculate our x and y offsets for our bitmap graphics
   byte x_offset = (lander_display.getDisplayWidth() - BITMAP_WIDTH) / 2;
+  byte y_offset = (lander_display.getDisplayHeight() - BITMAP_HEIGHT) / 2;
 
-  byte switch_value = digitalRead(CONFIRM_LEVER_PIN) == HIGH ? 1 : 0;
-  switch_value |= (digitalRead(SYSTEMS_LEVER_PIN) == HIGH ? 1 : 0) << 1;
-  switch_value |= (digitalRead(THRUST_LEVER_PIN) == HIGH ? 1 : 0) << 2;
+  /*
+   * Now we build up a 3 bit binary number by reading each of our switches,
+   * ensuring that the read value is 1 for on and 0 for off (using the
+   * ternary notation), and then shifting each bit to it's desired location.
+   * This converts our three switches to the values 0-7:
+   *   0b00000000 = 0
+   *   0b00000001 = 1
+   *   0b00000010 = 2
+   *   0b00000011 = 3
+   *   0b00000100 = 4
+   *   0b00000101 = 5
+   *   0b00000110 = 6
+   *   0b00000011 = 7
+   */
 
-  // Serial.println(switch_value);
-  counter_display.showNumberDecEx(switch_value);
+  // Read bit 0 (0b00000001), ensure 0 or 1 and save.
+  byte switch_value = digitalRead(SWITCH_BIT_0_PIN) == HIGH ? 1 : 0;
+  // Read bit 1 (0b00000010), ensure 0 or 1, shift left 1 bit and OR it into current value.
+  switch_value |= (digitalRead(SWITCH_BIT_1_PIN) == HIGH ? 1 : 0) << 1;
+  // Read bit 2 (0b00000100), ensure 0 or 1, shift left 2 bits and OR it into current value.
+  switch_value |= (digitalRead(SWITCH_BIT_2_PIN) == HIGH ? 1 : 0) << 2;
 
+  // Display calculated switch value on our 4 digit display
+  bitmap_number_display.showNumberDecEx(switch_value);
+
+  // Display selected bitmap on our OLED lander display
   lander_display.firstPage();
   do {
-    // .drawXBMP() displays each bitmap starting at the upper left corner
-    // (0, 0) that has width of 128 and height of 64.
-    lander_display.drawXBMP(x_offset, 0, BITMAP_WIDTH, BITMAP_HEIGHT, BITMAP_WIDTH[switch_value]);
+    // .drawXBMP() displays each bitmap centered in the display based
+    // on it's size.
+    lander_display.drawXBMP(x_offset, y_offset, BITMAP_WIDTH, BITMAP_HEIGHT, SWITCH_BITMAPS[switch_value]);
   } while (lander_display.nextPage());
 
   delay(100);

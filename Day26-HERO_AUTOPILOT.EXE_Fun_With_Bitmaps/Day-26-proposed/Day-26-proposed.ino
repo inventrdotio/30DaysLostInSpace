@@ -96,8 +96,6 @@ extern const unsigned char inventrCorpLogoBitmap[] U8X8_PROGMEM;
  *
  * This array simply holds pointers to each of our image arrays and
  * we can now reference each images using bitmaps[0], bitmap[1], etc.
- *
- * 
  */
 const static char* bitmaps[] = {
   niceRocketBro,
@@ -109,20 +107,26 @@ const static char* bitmaps[] = {
 // ************************************************
 void setup(void) {
   Serial.begin(9600);
-  lander_display.begin();
-  // lander_display.setColorIndex(1); // pixel on
+  lander_display.begin();   // initialize lander display
 }
 
 // ************************************************
 void loop(void) {
 
-  // picture loop
-  for (int i = 0; i < sizeof(bitmaps) / sizeof(bitmaps[0]); i++) {
+  // The number of items in our array is the total size of our array (in bytes)
+  // divided by the size of the first item.
+  int number_of_bitmaps = sizeof(bitmaps) / sizeof(bitmaps[0]);
+  
+  // Now display each of the bitmaps followed by a delay.
+  for (int i = 0; i < number_of_bitmaps; i++) {
     lander_display.firstPage();
     do {
-      // draw();
+      // .drawXBMP() displays each bitmap starting at the upper left corner
+      // (0, 0) that has width of 128 and height of 64.
       lander_display.drawXBMP(0, 0, 128, 64, bitmaps[i]);
     } while (lander_display.nextPage());
+
+    // Display each bitmap for 2 seconds.
     delay(2000);
   }
 }

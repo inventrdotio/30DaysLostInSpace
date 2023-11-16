@@ -110,8 +110,8 @@ Keypad myAwesomePad = Keypad(makeKeymap(buttons), rowPins, colPins, ROWS, COLS);
 // Here are the states our code will run through.  We'll build on this later to
 // perform the actual approach flight and landing in the mother ship bay.
 enum APPROACH_STATE {
-  APPROACH_INIT,    // Ensure all switches are off to begin
-  APPROACH_PREFLIGHT, // 
+  APPROACH_INIT,       // Ensure all switches are off to begin
+  APPROACH_PREFLIGHT,  //
   // APPROACH_IN_FLIGHT,
   APPROACH_FINAL,  // Lower landing gear!
   // APPROACH_TOO_FAST,
@@ -190,11 +190,15 @@ void loop(void) {
       }
 
       switch (customKey) {
-        case 'A':  // Lower landing gear
-          gear_state = GEAR_LOWERING;
+        case 'A':  // Lower landing gear unless already lowered
+          if (current_gear_bitmap != GEAR_BITMAP_COUNT - 1) {
+            gear_state = GEAR_LOWERING;
+          }
           break;
-        case 'B':  // Gear down
-          gear_state = GEAR_RAISING;
+        case 'B':  // Raise landing gear unless already raised
+          if (current_gear_bitmap != 0) {
+            gear_state = GEAR_RAISING;
+          }
       }
       break;
   }
@@ -204,6 +208,8 @@ void loop(void) {
     gear_state = GEAR_IDLE;
   }
 
+  Serial.print("Gear: ");
+  Serial.println(current_gear_bitmap);
   // Display calculated switch value on our 4 digit display
   // bitmap_number_display.showNumberDecEx(switch_value);
 

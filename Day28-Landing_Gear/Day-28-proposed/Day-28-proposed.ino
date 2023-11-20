@@ -248,12 +248,12 @@ void loop(void) {
       // Display switch status for INIT and PREFLIGHT states.
       case APPROACH_INIT:
       case APPROACH_PREFLIGHT:
-        preflightDisplay(approach_state, thrust_lever, systems_lever, confirm_lever);
+        displayPreFlight(approach_state, thrust_lever, systems_lever, confirm_lever);
         break;
 
       // Display current lander bitmap, showing gear status.
       case APPROACH_FINAL:
-        finalDisplay(current_gear_bitmap_index);
+        displayFinal(current_gear_bitmap_index);
         break;
     }
   } while (lander_display.nextPage());
@@ -263,7 +263,7 @@ void loop(void) {
 
 // ************************************************
 // Update lander display with the status of our switches for INIT and PREFLIGHT states
-void preflightDisplay(enum APPROACH_STATE approach_state,
+void displayPreFlight(enum APPROACH_STATE approach_state,
                       bool thruster_lever,
                       bool systems_lever,
                       bool confirm_lever) {
@@ -291,7 +291,7 @@ void preflightDisplay(enum APPROACH_STATE approach_state,
 // ************************************************
 // When lander is about to land we'll display a "final approach" display showing
 // the landing gear status.
-void finalDisplay(int current_gear_bitmap_index) {
+void displayFinal(int current_gear_bitmap_index) {
   // Calculate our x and y offsets to center our bitmap graphics
   byte x_offset = (lander_display.getDisplayWidth() - LANDING_GEAR_BITMAP_WIDTH) / 2;
   byte y_offset = (lander_display.getDisplayHeight() - LANDING_GEAR_BITMAP_HEIGHT) / 2;

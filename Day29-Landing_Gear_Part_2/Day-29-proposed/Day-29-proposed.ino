@@ -217,6 +217,7 @@ void loop(void) {
   static int lander_velocity = 0;  // Initial lander lvelocity relative to mother ship
   static int mother_ship_x_offset = 0;
   static int mother_ship_y_offset = 0;
+  static unsigned long approach_start_time = 0;
 
   // Read current values of all of our switches as booleans ("on" is true, "off" is false)
   bool thrust_lever = digitalRead(THRUST_LEVER_PIN);
@@ -279,16 +280,22 @@ void loop(void) {
         customKey = last_key;
       }
       // Serial.print(" -> ");
-      Serial.println(int(customKey));
+      // Serial.print(int(customKey));
       // Serial.print(", ");
       // Serial.println(int(last_key));
 
       switch (customKey) {
         case RAISE_VELOCITY:
           lander_velocity++;
+          if (approach_start_time == 0) {
+            approach_start_time = millis();
+          }
           break;
         case LOWER_VELOCITY:
           lander_velocity--;
+          if (lander_velocity < 0) {
+            lander_velocity = 0;
+          }
           break;
         case LOWER_GEAR:  // Lower landing gear unless already lowered
           if (current_gear_bitmap_index != GEAR_BITMAP_COUNT - 1) {
@@ -330,9 +337,19 @@ void loop(void) {
       }
 
       // TODO: adjust drift rate based on speed/distance?
-      const byte MAX_DRIFT = 16;
-      mother_ship_x_offset += random(-1, 2);
-      mother_ship_y_offset += random(-1, 2);
+      // getDrift(lander_velocity, current_gear_bitmap_index)
+      const byte MAX_DRIFT = 18;
+      int drift;
+      drift = random(-1, 3);
+      if (drift == 2) {
+        drift = 0;
+      }
+      mother_ship_x_offset += drift;
+      drift = random(-1, 3);
+      if (drift == 2) {
+        drift = 0;
+      }
+      mother_ship_y_offset += drift;
       // TODO: mother ship off screen?  CLIPPING
       if (mother_ship_x_offset > MAX_DRIFT) mother_ship_x_offset = MAX_DRIFT;
       if (mother_ship_x_offset < -MAX_DRIFT) mother_ship_x_offset = -MAX_DRIFT;
@@ -379,7 +396,7 @@ void loop(void) {
   lander_distance -= lander_velocity;
   char* ending_bitmp;
   if (lander_distance <= 0) {
-    if (abs(mother_ship_x_offset) < MAX_MOTHER_SHIP_WIDTH && abs(mother_ship_y_offset) < MAX_MOTHER_SHIP_HEIGHT) {
+    if (abs(mother_ship_x_offset) < ((MAX_MOTHER_SHIP_WIDTH + 1) / 2) && abs(mother_ship_y_offset) < ((MAX_MOTHER_SHIP_HEIGHT + 1) / 2)) {
       Serial.println("INSIDE!");
       if (lander_velocity <= 2) {
         Serial.println("Speed OK");
@@ -388,7 +405,7 @@ void loop(void) {
           ending_bitmp = EndingBitmap_Success;
         } else {
           Serial.println("no gear crash");
-          ending_bitmp = EndingBitmap_TooSlow;
+          ending_bitmp = EndingBitmap_No_Gear;
         }
       } else {
         Serial.println("TOO FAST!");
@@ -403,9 +420,16 @@ void loop(void) {
     // EndingBitmap_TooFast,
     // EndingBitmap_Success
     distance_display.showNumberDec(0);
+    delay(5000);
 
+    unsigned long elapsed_time = millis() - approach_start_time;
+    Serial.println(elapsed_time);
+    char buffer[20];
+    // Call out modulo operator below
+    sprintf(buffer, "%4lu.%03lu Sec", elapsed_time / 1000, elapsed_time % 1000);
     lander_display.firstPage();
     do {
+      lander_display.drawStr(0, 0, buffer);
       lander_display.drawXBMP(0, 10, ENDING_BITMAP_WIDTH, ENDING_BITMAP_HEIGHT, ending_bitmp);
     } while (lander_display.nextPage());
     // delay(5000);
@@ -420,7 +444,7 @@ void loop(void) {
       // }
     };
   }
-
+  // Serial.println(millis() - loop_start_time);
   delay(100);  // Delay 1/10 second before next loop
 }
 

@@ -64,6 +64,7 @@ U8G2_SH1106_128X64_NONAME_2_HW_I2C lander_display(U8G2_R0, /* reset=*/U8X8_PIN_N
 // ************************************************
 #include "directional_arrows.h"
 #include "small_landing_gear_bitmaps.h"
+#include "endingbitmaps.h"
 
 // Create an array of pointers to each of the bitmap images.
 // For a smoother animation you could simply add additional bitmaps
@@ -376,22 +377,48 @@ void loop(void) {
     }
   } while (lander_display.nextPage());
   lander_distance -= lander_velocity;
+  char* ending_bitmp;
   if (lander_distance <= 0) {
-    if (abs(mother_ship_x_offset) < MAX_MOTHER_SHIP_WIDTH &&
-        abs(mother_ship_y_offset) < MAX_MOTHER_SHIP_HEIGHT) {
+    if (abs(mother_ship_x_offset) < MAX_MOTHER_SHIP_WIDTH && abs(mother_ship_y_offset) < MAX_MOTHER_SHIP_HEIGHT) {
       Serial.println("INSIDE!");
+      if (lander_velocity <= 2) {
+        Serial.println("Speed OK");
+        if (current_gear_bitmap_index == GEAR_BITMAP_COUNT - 1) {
+          Serial.println("Gear down");
+          ending_bitmp = EndingBitmap_Success;
+        } else {
+          Serial.println("no gear crash");
+          ending_bitmp = EndingBitmap_TooSlow;
+        }
+      } else {
+        Serial.println("TOO FAST!");
+        ending_bitmp = EndingBitmap_TooFast;
+      }
     } else {
       Serial.println("MISSED!");
+      ending_bitmp = EndingBitmap_MissedMothership;
     }
-    if (lander_velocity <= 2) {
-      Serial.println("Speed OK");
-    } else {
-      Serial.println("TOO FAST!");
-    }
+    // EndingBitmap_TooSlow,
+    // EndingBitmap_MissedMothership,
+    // EndingBitmap_TooFast,
+    // EndingBitmap_Success
     distance_display.showNumberDec(0);
 
-    while (1)
-      ;
+    lander_display.firstPage();
+    do {
+      lander_display.drawXBMP(0, 10, ENDING_BITMAP_WIDTH, ENDING_BITMAP_HEIGHT, ending_bitmp);
+    } while (lander_display.nextPage());
+    // delay(5000);
+
+    while (1) {
+      // for (int i = 0; i < EndingBitmap_allArray_LEN; i++) {
+      //   lander_display.firstPage();
+      //   do {
+      //     lander_display.drawXBMP(0, 10, ENDING_BITMAP_WIDTH, ENDING_BITMAP_HEIGHT, EndingBitmap_allArray[i]);
+      //   } while (lander_display.nextPage());
+      //   delay(2000);
+      // }
+    };
   }
 
   delay(100);  // Delay 1/10 second before next loop
@@ -491,13 +518,7 @@ void displayInFlight(int lander_distance,
 
   byte x_offset = CIRCLE_CENTER_X + mother_ship_x_offset - (mother_ship_width / 2);
   byte y_offset = CIRCLE_CENTER_Y + mother_ship_y_offset - (mother_ship_height / 2);
-  if (mother_ship_height < 1) {
-    mother_ship_height = 1;
-  }
   lander_display.drawFrame(x_offset, y_offset, mother_ship_width, mother_ship_height);
-  if (mother_ship_height < 1) {
-    mother_ship_height = 1;
-  }
 }
 
 // ************************************************

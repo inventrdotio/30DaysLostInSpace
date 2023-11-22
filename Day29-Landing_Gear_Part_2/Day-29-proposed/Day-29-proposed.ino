@@ -535,7 +535,7 @@ void displayInFlight(int lander_distance,
   }
 
   char buffer[10];
-  sprintf(buffer, "SPD: %4d", lander_velocity);
+  sprintf(buffer, "SPD: %2d", lander_velocity);
   int width = lander_display.getStrWidth(buffer);
   lander_display.drawStr(lander_display.getDisplayWidth() - width, 0, buffer);
 
@@ -562,6 +562,8 @@ void displayFinal(int current_gear_bitmap_index) {
     lander_display.drawStr(64+11, 20, "Drop gear");
   } else if (current_gear_bitmap_index < gear_down_index) {
     lander_display.drawStr(64+11, 20, "Lowering");
+  } else {
+    lander_display.drawStr(64+11, 20, "Gear OK");
   }
 
   // Calculate our x and y offsets to center our bitmap graphics

@@ -536,10 +536,11 @@ void displayInFlight(int lander_distance,
 
   char buffer[10];
   sprintf(buffer, "SPD: %4d", lander_velocity);
-  lander_display.drawStr(64 + 2, 0, buffer);
+  int width = lander_display.getStrWidth(buffer);
+  lander_display.drawStr(lander_display.getDisplayWidth() - width, 0, buffer);
 
-  lander_display.drawLine(64, 0, 64, 30);
-  lander_display.drawLine(64, 30, 127, 30);
+  // lander_display.drawLine(64, 0, 64, 30);
+  // lander_display.drawLine(64, 30, 127, 30);
 
   // lander_display.drawXBMP(72, 32,
   //                         LANDING_GEAR_BITMAP_WIDTH, LANDING_GEAR_BITMAP_HEIGHT,
@@ -554,12 +555,27 @@ void displayInFlight(int lander_distance,
 // When lander is about to land we'll display a "final approach" display showing
 // the landing gear status.
 void displayFinal(int current_gear_bitmap_index) {
+  int gear_down_index = GEAR_BITMAP_COUNT - 1;
+
+  // Serial.println(lander_display.getStrWidth("Drop Gear"));
+  if (current_gear_bitmap_index == 0) {
+    lander_display.drawStr(64+11, 20, "Drop gear");
+  } else if (current_gear_bitmap_index < gear_down_index) {
+    lander_display.drawStr(64+11, 20, "Lowering");
+  }
+
   // Calculate our x and y offsets to center our bitmap graphics
-  byte x_offset = (lander_display.getDisplayWidth() - LANDING_GEAR_BITMAP_WIDTH) / 2;
-  byte y_offset = (lander_display.getDisplayHeight() - LANDING_GEAR_BITMAP_HEIGHT) / 2;
+  // Get offsets to lower-right area of screen.  Height allows 3 lines of text above
+  byte x_offset = (lander_display.getDisplayWidth() / 2);   // 64
+  x_offset += ((lander_display.getDisplayWidth() - x_offset) - LANDING_GEAR_BITMAP_WIDTH) / 2;
+  byte y_offset = lander_display.getDisplayHeight() - 30;
+  y_offset += ((lander_display.getDisplayHeight() - y_offset) - LANDING_GEAR_BITMAP_HEIGHT) / 2;
+  // Serial.println(y_offset);
+  // x_offset = (lander_display.getDisplayWidth() - LANDING_GEAR_BITMAP_WIDTH) / 2;
+  // y_offset = (lander_display.getDisplayHeight() - LANDING_GEAR_BITMAP_HEIGHT) / 2;
 
   // Draw current bitmap centered in display.
-  lander_display.drawXBMP(72, 32,
+  lander_display.drawXBMP(x_offset, y_offset,
                           LANDING_GEAR_BITMAP_WIDTH, LANDING_GEAR_BITMAP_HEIGHT,
                           LANDER_BITMAPS[current_gear_bitmap_index]);
 }

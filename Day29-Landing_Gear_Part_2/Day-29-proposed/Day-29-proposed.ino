@@ -203,16 +203,16 @@ void setup(void) {
   Serial.println("Ready!");
 }
 
-const int INITIAL_DISTANCE = 1000;
+const int INITIAL_DISTANCE = 1394;
 const byte MAX_MOTHER_SHIP_WIDTH = 21;
 const byte MAX_MOTHER_SHIP_HEIGHT = 15;
 
 // ************************************************
 // ************************************************
 void loop(void) {
-  static int current_gear_bitmap_index = 0;                    // Start with image of lander with gear up
-  static enum APPROACH_STATE approach_state = APPROACH_FINAL;  // APPROACH_INIT;  // Initial approach state
-  static enum GEAR_STATE gear_state = GEAR_IDLE;               // Inital landing gear state
+  static int current_gear_bitmap_index = 0;                        // Start with image of lander with gear up
+  static enum APPROACH_STATE approach_state = APPROACH_IN_FLIGHT;  // APPROACH_INIT;  // Initial approach state
+  static enum GEAR_STATE gear_state = GEAR_IDLE;                   // Inital landing gear state
   static int lander_distance = INITIAL_DISTANCE;
   static int lander_velocity = 0;  // Initial lander lvelocity relative to mother ship
   static int mother_ship_x_offset = 0;
@@ -249,7 +249,7 @@ void loop(void) {
       // Once we have enabled thrusters and systems and confirmed we're ready
       // then today we'll just test the landing gear for now (final approach).
       if (thrust_lever && systems_lever && confirm_lever) {  // All switches are "on"
-        approach_state = APPROACH_FINAL;                     // for now just enable landing gear testing
+        approach_state = APPROACH_IN_FLIGHT;                 // for now just enable landing gear testing
       }
       break;
 
@@ -297,9 +297,11 @@ void loop(void) {
             lander_velocity = 0;
           }
           break;
-        case LOWER_GEAR:  // Lower landing gear unless already lowered
-          if (current_gear_bitmap_index != GEAR_BITMAP_COUNT - 1) {
-            gear_state = GEAR_LOWERING;
+        case LOWER_GEAR:                           // Lower landing gear unless already lowered
+          if (approach_state == APPROACH_FINAL) {  // Only works on final approach
+            if (current_gear_bitmap_index != GEAR_BITMAP_COUNT - 1) {
+              gear_state = GEAR_LOWERING;
+            }
           }
           break;
         case RAISE_GEAR:  // Raise landing gear unless already raised
@@ -356,6 +358,10 @@ void loop(void) {
       if (mother_ship_y_offset > MAX_DRIFT) mother_ship_y_offset = MAX_DRIFT;
       if (mother_ship_y_offset < -MAX_DRIFT) mother_ship_y_offset = -MAX_DRIFT;
 
+      // Prepare for landing on final approach
+      if (lander_distance < (INITIAL_DISTANCE / 10)) {
+        approach_state = APPROACH_FINAL;  // on final approach - enable gear and warn
+      }
       break;
   }
 
@@ -385,17 +391,18 @@ void loop(void) {
         displayPreFlight(approach_state, thrust_lever, systems_lever, confirm_lever);
         break;
 
-      case APPROACH_IN_FLIGHT:
       case APPROACH_FINAL:
+        displayFinal(current_gear_bitmap_index);
+      case APPROACH_IN_FLIGHT:
         displayInFlight(lander_distance, lander_velocity,
-                        mother_ship_x_offset, mother_ship_y_offset,
-                        current_gear_bitmap_index);
+                        mother_ship_x_offset, mother_ship_y_offset);
         break;
     }
   } while (lander_display.nextPage());
   lander_distance -= lander_velocity;
   char* ending_bitmp;
   if (lander_distance <= 0) {
+    lander_distance = 0;
     if (abs(mother_ship_x_offset) < ((MAX_MOTHER_SHIP_WIDTH + 1) / 2) && abs(mother_ship_y_offset) < ((MAX_MOTHER_SHIP_HEIGHT + 1) / 2)) {
       Serial.println("INSIDE!");
       if (lander_velocity <= 2) {
@@ -415,34 +422,33 @@ void loop(void) {
       Serial.println("MISSED!");
       ending_bitmp = EndingBitmap_MissedMothership;
     }
-    // EndingBitmap_TooSlow,
-    // EndingBitmap_MissedMothership,
-    // EndingBitmap_TooFast,
-    // EndingBitmap_Success
+
     distance_display.showNumberDec(0);
-    delay(5000);
+    delay(1000);
 
     unsigned long elapsed_time = millis() - approach_start_time;
     Serial.println(elapsed_time);
     char buffer[20];
+
     // Call out modulo operator below
     sprintf(buffer, "%4lu.%03lu Sec", elapsed_time / 1000, elapsed_time % 1000);
-    lander_display.firstPage();
-    do {
-      lander_display.drawStr(0, 0, buffer);
-      lander_display.drawXBMP(0, 10, ENDING_BITMAP_WIDTH, ENDING_BITMAP_HEIGHT, ending_bitmp);
-    } while (lander_display.nextPage());
-    // delay(5000);
 
-    while (1) {
-      // for (int i = 0; i < EndingBitmap_allArray_LEN; i++) {
-      //   lander_display.firstPage();
-      //   do {
-      //     lander_display.drawXBMP(0, 10, ENDING_BITMAP_WIDTH, ENDING_BITMAP_HEIGHT, EndingBitmap_allArray[i]);
-      //   } while (lander_display.nextPage());
-      //   delay(2000);
-      // }
-    };
+    do {
+      lander_display.firstPage();
+      do {
+        lander_display.drawStr(0, 0, buffer);
+        lander_display.drawXBMP(0, 10, ENDING_BITMAP_WIDTH, ENDING_BITMAP_HEIGHT, ending_bitmp);
+      } while (lander_display.nextPage());
+      delay(2000);
+
+      lander_display.firstPage();
+      do {
+        displayFinal(current_gear_bitmap_index);
+        displayInFlight(lander_distance, lander_velocity,
+                        mother_ship_x_offset, mother_ship_y_offset);
+      } while (lander_display.nextPage());
+      delay(2000);
+    } while (true);
   }
   // Serial.println(millis() - loop_start_time);
   delay(100);  // Delay 1/10 second before next loop
@@ -479,8 +485,7 @@ void displayPreFlight(enum APPROACH_STATE approach_state,
 void displayInFlight(int lander_distance,
                      int lander_velocity,
                      int mother_ship_x_offset,
-                     int mother_ship_y_offset,
-                     int gear_bitmap) {
+                     int mother_ship_y_offset) {
 
   int mother_ship_width = MAX_MOTHER_SHIP_WIDTH - (lander_distance / (INITIAL_DISTANCE / 20));
   int mother_ship_height = MAX_MOTHER_SHIP_HEIGHT - (lander_distance / (INITIAL_DISTANCE / 20));
@@ -536,9 +541,9 @@ void displayInFlight(int lander_distance,
   lander_display.drawLine(64, 0, 64, 30);
   lander_display.drawLine(64, 30, 127, 30);
 
-  lander_display.drawXBMP(72, 32,
-                          LANDING_GEAR_BITMAP_WIDTH, LANDING_GEAR_BITMAP_HEIGHT,
-                          LANDER_BITMAPS[gear_bitmap]);
+  // lander_display.drawXBMP(72, 32,
+  //                         LANDING_GEAR_BITMAP_WIDTH, LANDING_GEAR_BITMAP_HEIGHT,
+  //                         LANDER_BITMAPS[gear_bitmap]);
 
   byte x_offset = CIRCLE_CENTER_X + mother_ship_x_offset - (mother_ship_width / 2);
   byte y_offset = CIRCLE_CENTER_Y + mother_ship_y_offset - (mother_ship_height / 2);
@@ -554,7 +559,7 @@ void displayFinal(int current_gear_bitmap_index) {
   byte y_offset = (lander_display.getDisplayHeight() - LANDING_GEAR_BITMAP_HEIGHT) / 2;
 
   // Draw current bitmap centered in display.
-  lander_display.drawXBMP(x_offset, y_offset,
+  lander_display.drawXBMP(72, 32,
                           LANDING_GEAR_BITMAP_WIDTH, LANDING_GEAR_BITMAP_HEIGHT,
                           LANDER_BITMAPS[current_gear_bitmap_index]);
 }

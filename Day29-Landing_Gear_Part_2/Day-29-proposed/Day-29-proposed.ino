@@ -181,10 +181,10 @@ enum LANDER_CONTROLS {
 
 // Define our button array using constants to be returned for each button
 char control_buttons[CONTROL_ROW_COUNT][CONTROL_COLUMN_COUNT] = {
-  { STEER_UP_LEFT, STEER_UP, STEER_UP_RIGHT, LOWER_GEAR },        // 1st row
-  { STEER_LEFT, UNUSED, STEER_RIGHT, RAISE_GEAR },                // 2nd row
-  { STEER_DOWN_LEFT, STEER_DOWN, STEER_DOWN_LEFT, RAISE_SPEED },  // 3rd row
-  { UNUSED, UNUSED, UNUSED, LOWER_SPEED },                        // 4th row
+  { STEER_UP_LEFT, STEER_UP, STEER_UP_RIGHT, LOWER_GEAR },         // 1st row
+  { STEER_LEFT, UNUSED, STEER_RIGHT, RAISE_GEAR },                 // 2nd row
+  { STEER_DOWN_LEFT, STEER_DOWN, STEER_DOWN_RIGHT, RAISE_SPEED },  // 3rd row
+  { UNUSED, UNUSED, UNUSED, LOWER_SPEED },                         // 4th row
 };
 
 // Create lander button control object.
